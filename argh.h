@@ -8,7 +8,11 @@
 #include <map>
 #include <cassert>
 
+#ifdef HAVE_OPTIONAL
+
 #include <optional.hpp>
+
+#endif
 
 namespace argh
 {
@@ -18,9 +22,7 @@ namespace argh
         void add_option(std::string const& name);
         void parse(int argc, char* argv[], bool strict = true);
 
-        bool flag(std::string const& name, bool default_value = false);
-        bool operator[](std::string const& name);
-
+        // iteration
         auto flags_count()        const { return flags_.size();     }
         auto const flags_cbegin() const { return flags_.cbegin();   }
         auto const flags_cend()   const { return flags_.cend();     }
@@ -33,17 +35,45 @@ namespace argh
         auto const params_cbegin() const { return params_.cbegin(); }
         auto const params_cend()   const { return params_.cend();   }
 
-        template <typename T>
-        using optional = std::experimental::optional<T>;
+        // accessors
+        //////////////////////////////////////////////////////////////////////////
+        // flag (boolean) accessors
+        // return true if the flag appeared, otherwise false.
+        bool operator[](std::string const& name);
+
+        //////////////////////////////////////////////////////////////////////////
+        // returns positional parameter string by order. Like argv[] but without the options
+        std::string const& operator[](size_t ind);
 
         template <typename T>
-        optional<T> get(std::string const& name);
+        bool get(size_t ind, T& val_out);
 
+        template <typename T>
+        bool get(size_t ind, T& val_out, T const& default_value);
+
+        //////////////////////////////////////////////////////////////////////////
+        // option accessors, give a name get an (optional or default) value
         template <typename T>
         bool get(std::string const& name, T& val_out);
 
         template <typename T>
-        bool get(std::string const& name, T& val_out, T const& default_value);        
+        bool get(std::string const& name, T& val_out, T const& default_value);
+
+#ifdef HAVE_OPTIONAL
+
+        template <typename T>
+        using optional = std::experimental::optional<T>;
+
+        template <typename T>
+        optional<T> get(std::string const& name)
+        {
+            T val;
+            if (get(name, val))
+                return val;
+            return{};
+        }
+
+#endif
 
     private:
         std::string trim_leading_dashes(std::string const& name);
@@ -56,10 +86,11 @@ namespace argh
         std::vector<std::string> params_;
         std::multiset<std::string> flags_;
         std::set<std::string> registeredOptions_;
+        std::string empty_;
     };
 
-    //////////////////////////////////////////////////////////////////////////
 
+    //////////////////////////////////////////////////////////////////////////
 
     void parser::parse(int argc, char* argv[], bool strict)
     {
@@ -142,30 +173,18 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
-    bool parser::flag(std::string const & name, bool default_value)
-    {
-        if (flags_.end() != flags_.find(trim_leading_dashes(name)))
-            return true;
-        return default_value;
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-
     bool parser::operator[](std::string const& name)
     {
-        return flag(name);
+        return flags_.end() != flags_.find(trim_leading_dashes(name));
     }
-
 
     //////////////////////////////////////////////////////////////////////////
 
-    template <typename T>
-    parser::optional<T> parser::get(std::string const& name)
+    std::string const& parser::operator[](size_t ind)
     {
-        T val;
-        if (get(name, val))
-            return val;
-        return {};
+        if (0 <= ind && ind < params_.size())
+            return params_[ind];
+        return empty_;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -201,10 +220,41 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
+    template <typename T>
+    bool parser::get(size_t ind, T& val_out)
+    {
+        if (name.empty())
+            return false;
+
+        if (ind < 0 || params_.size() <= ind)
+            return false;
+
+        std::istringstream istr(params_[ind]);
+        istr >> val_out;
+        if (istr.fail() || istr.bad())
+            return false;
+        return true;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    template <typename T>
+    bool parser::get(size_t ind, T& val_out, T const& default_value)
+    {
+        if (get(ind, val_out))
+            return true;
+        val_out = default_value;
+        return true;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
     void parser::add_option(std::string const& name)
     {
         registeredOptions_.insert(trim_leading_dashes(name));
     }
+
+    //////////////////////////////////////////////////////////////////////////
 }
 
 
