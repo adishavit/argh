@@ -89,6 +89,33 @@ TEST_CASE("Test negative numbers are not options")
     CHECK(0 == cmdl.flags_count());
 }
 
+TEST_CASE("Test default value technique")
+{
+    char* argv[] = { "-int", "-99999999999", "-double", "-1.3444444444e-2", "-string", "Hello" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    parser cmdl;
+    cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
+
+    int v_int = -1;    
+    double v_dbl = -1;
+    
+    CHECK(!(cmdl("-int") >> v_int));
+    CHECK(-1 == v_int);
+
+    CHECK(!(cmdl("-string") >> v_int));
+    CHECK(-1 == v_int);
+
+    CHECK(!(cmdl("-XXXXX") >> v_int));
+    CHECK(-1 == v_int);
+
+    CHECK(!(cmdl("-string") >> v_dbl));
+    CHECK(-1 == v_dbl);
+
+    CHECK(!(cmdl("-XXXXX") >> v_dbl));
+    CHECK(-1 == v_dbl);
+
+}
+
 TEST_CASE("Test un-reg option modes")
 {
     char* argv[] = { "-d", "-f", "123", "-g", "456", "-e" };
