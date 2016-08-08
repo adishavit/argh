@@ -20,8 +20,12 @@ namespace argh
     class parser
     {
     public:
-        void add_option(std::string const& name);
-        void parse(int argc, char* argv[], bool strict = true);
+        enum Mode { PREFER_FLAG_FOR_UNREG_OPTION, 
+                    PREFER_PARAM_FOR_UNREG_OPTION 
+                  };
+
+        void add_param(std::string const& name);
+        void parse(int argc, char* argv[], Mode mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
         // iteration
         auto flags_count()       const { return flags_.size();     }
@@ -62,14 +66,14 @@ namespace argh
         std::map<std::string, std::string> params_;
         std::vector<std::string> pos_args_;
         std::multiset<std::string> flags_;
-        std::set<std::string> registeredOptions_;
+        std::set<std::string> registeredParams_;
         std::string empty_;
     };
 
 
     //////////////////////////////////////////////////////////////////////////
 
-    void parser::parse(int argc, char* argv[], bool strict)
+    void parser::parse(int argc, char* argv[], Mode mode)
     {
         // convert to strings
         args_.resize(argc);
@@ -84,10 +88,10 @@ namespace argh
                continue;
             }
 
+            auto name = trim_leading_dashes(args_[i]);
+
             // any potential option will get as its value the next arg, unless that arg is an option too
             // in that case it will be determined a flag.
-
-            auto name = trim_leading_dashes(args_[i]);
             if (i == args_.size()-1 || is_option(args_[i+1]))
             {
                flags_.emplace(name);
@@ -96,26 +100,31 @@ namespace argh
 
             // if 'name' is a pre-registered option, then the next arg cannot be a free parameter to it is skipped
             // otherwise we have 2 modes:
-            // Strict mode: a non-registered 'name' is determined a flag. 
-            //              The following value (the next arg) will be a free parameter.
+            // PREFER_FLAG_FOR_UNREG_OPTION: a non-registered 'name' is determined a flag. 
+            //                               The following value (the next arg) will be a free parameter.
             //
-            // Slack mode: the next arg will appear BOTH as a free parameter AND as the value of that option.
-            //             AND the arg will also be stored as a flag since that is a valid condition too.
-            //             this saves the user from having to pre-register all/any options at the cost of having to manage
-            //             duplicate flags and option values that also appear as free-params
-            //             This is suitable for users who do not use free params and do the validation themselves.
+            // PREFER_PARAM_FOR_UNREG_OPTION: a non-registered 'name' is determined a parameter, the next arg
+            //                                will be the value of that option.
 
-            if (registeredOptions_.find(name) != registeredOptions_.end())
+            if (registeredParams_.find(name) != registeredParams_.end())
             {
                 params_.insert({ name, args_[i + 1] });
                 ++i; // skip next value, it is not a free parameter
+                continue;
             }
-            else
+
+            switch (mode)
             {
+            case argh::parser::PREFER_FLAG_FOR_UNREG_OPTION:
                 flags_.emplace(name);
-                if (!strict)
-                    params_.insert({ name, args_[i + 1] });
+                break;
+            case argh::parser::PREFER_PARAM_FOR_UNREG_OPTION:
+                params_.insert({ name, args_[i + 1] });
+                break;
+            default:
+                break;
             }
+
         };
     }
 
@@ -190,9 +199,9 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
-    void parser::add_option(std::string const& name)
+    void parser::add_param(std::string const& name)
     {
-        registeredOptions_.insert(trim_leading_dashes(name));
+        registeredParams_.insert(trim_leading_dashes(name));
     }
 
     //////////////////////////////////////////////////////////////////////////

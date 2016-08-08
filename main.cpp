@@ -21,7 +21,7 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     argh::parser cmdl;
-    cmdl.add_option("-f");
+    cmdl.add_param("-f");
     cmdl.parse(argc, argv);
 
     if (cmdl["-f"])
