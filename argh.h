@@ -8,14 +8,15 @@
 #include <map>
 #include <cassert>
 
-#ifdef HAVE_OPTIONAL
-
-#include <optional.hpp>
-
-#endif
-
 namespace argh
 {
+    // Terminology:
+    // A command line is composed of 2 types of args:
+    // 1. Positional args, i.e. free standing values
+    // 2. Options: args beginnning with '-'. We identify two kinds:
+    //    2.1: Flags: boolean options =>  (exist ? true : false)
+    //    2.2: Parameters: a name followed by a non-option value
+
     class parser
     {
     public:
@@ -23,57 +24,33 @@ namespace argh
         void parse(int argc, char* argv[], bool strict = true);
 
         // iteration
-        auto flags_count()        const { return flags_.size();     }
-        auto const flags_cbegin() const { return flags_.cbegin();   }
-        auto const flags_cend()   const { return flags_.cend();     }
+        auto flags_count()       const { return flags_.size();     }
+        auto const flags_begin() const { return flags_.cbegin();   }
+        auto const flags_end()   const { return flags_.cend();     }
 
-        auto options_count()        const { return options_.size();     }
-        auto const options_cbegin() const { return options_.cbegin();   }
-        auto const options_cend()   const { return options_.cend();     }
+        auto params_count()       const { return params_.size();     }
+        auto const params_begin() const { return params_.cbegin();   }
+        auto const params_end()   const { return params_.cend();     }
 
-        auto params_count()        const { return params_.size();   }
-        auto const params_cbegin() const { return params_.cbegin(); }
-        auto const params_cend()   const { return params_.cend();   }
-
-        // accessors
-        //////////////////////////////////////////////////////////////////////////
-        // flag (boolean) accessors
-        // return true if the flag appeared, otherwise false.
-        bool operator[](std::string const& name);
+        auto size()        const { return pos_args_.size();   }
+        auto const begin() const { return pos_args_.cbegin(); }
+        auto const end()   const { return pos_args_.cend();   }
 
         //////////////////////////////////////////////////////////////////////////
-        // returns positional parameter string by order. Like argv[] but without the options
+        // Accessors
+
+        // flag (boolean) accessors: return true if the flag appeared, otherwise false.
+        bool operator[](std::string const& name); 
+
+        // returns positional arg string by order. Like argv[] but without the options
         std::string const& operator[](size_t ind);
 
-        template <typename T>
-        bool get(size_t ind, T& val_out);
+        // returns a std::istream that can be used to convert a positional arg to a typed value.
+        std::istringstream operator()(size_t ind);
 
-        template <typename T>
-        bool get(size_t ind, T& val_out, T const& default_value);
-
-        //////////////////////////////////////////////////////////////////////////
-        // option accessors, give a name get an (optional or default) value
-        template <typename T>
-        bool get(std::string const& name, T& val_out);
-
-        template <typename T>
-        bool get(std::string const& name, T& val_out, T const& default_value);
-
-#ifdef HAVE_OPTIONAL
-
-        template <typename T>
-        using optional = std::experimental::optional<T>;
-
-        template <typename T>
-        optional<T> get(std::string const& name)
-        {
-            T val;
-            if (get(name, val))
-                return val;
-            return{};
-        }
-
-#endif
+        // parameter accessors, give a name get an std::istream that can be used to convert to a typed value.
+        // call .str() on result to get as string
+        std::istringstream operator()(std::string const& name);
 
     private:
         std::string trim_leading_dashes(std::string const& name);
@@ -82,8 +59,8 @@ namespace argh
 
     private:
         std::vector<std::string> args_;
-        std::multimap<std::string, std::string> options_;
-        std::vector<std::string> params_;
+        std::map<std::string, std::string> params_;
+        std::vector<std::string> pos_args_;
         std::multiset<std::string> flags_;
         std::set<std::string> registeredOptions_;
         std::string empty_;
@@ -103,7 +80,7 @@ namespace argh
         {
             if (!is_option(args_[i]))
             {
-               params_.emplace_back(args_[i]);
+               pos_args_.emplace_back(args_[i]);
                continue;
             }
 
@@ -130,14 +107,14 @@ namespace argh
 
             if (registeredOptions_.find(name) != registeredOptions_.end())
             {
-                options_.insert({ name, args_[i + 1] });
+                params_.insert({ name, args_[i + 1] });
                 ++i; // skip next value, it is not a free parameter
             }
             else
             {
                 flags_.emplace(name);
                 if (!strict)
-                    options_.insert({ name, args_[i + 1] });
+                    params_.insert({ name, args_[i + 1] });
             }
         };
     }
@@ -182,69 +159,33 @@ namespace argh
 
     std::string const& parser::operator[](size_t ind)
     {
-        if (0 <= ind && ind < params_.size())
-            return params_[ind];
+        if (0 <= ind && ind < pos_args_.size())
+            return pos_args_[ind];
         return empty_;
     }
 
     //////////////////////////////////////////////////////////////////////////
 
-    template<typename T>
-    bool parser::get(std::string const & name, T & val_out)
+    std::istringstream parser::operator()(std::string const& name)
     {
         if (name.empty())
-            return false;
+            return std::istringstream();
 
-        auto optIt = options_.find(trim_leading_dashes(name));
-        if (options_.end() == optIt)
-            return false;
+        auto optIt = params_.find(trim_leading_dashes(name));
+        if (params_.end() == optIt)
+            return std::istringstream();;
 
-        std::istringstream istr(optIt->second);
-        istr >> val_out;
-        if (istr.fail() || istr.bad())
-            return false;
-
-        return true;
+        return std::istringstream(optIt->second);
     }
 
     //////////////////////////////////////////////////////////////////////////
 
-    template<typename T>
-    bool parser::get(std::string const & name, T & val_out, T const& default_value)
+    std::istringstream parser::operator()(size_t ind)
     {
-        if (get(name, val_out))
-            return true;
-        val_out = default_value;
-        return true;
-    }
+        if (pos_args_.size() <= ind)
+            return std::istringstream();
 
-    //////////////////////////////////////////////////////////////////////////
-
-    template <typename T>
-    bool parser::get(size_t ind, T& val_out)
-    {
-        if (name.empty())
-            return false;
-
-        if (ind < 0 || params_.size() <= ind)
-            return false;
-
-        std::istringstream istr(params_[ind]);
-        istr >> val_out;
-        if (istr.fail() || istr.bad())
-            return false;
-        return true;
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-
-    template <typename T>
-    bool parser::get(size_t ind, T& val_out, T const& default_value)
-    {
-        if (get(ind, val_out))
-            return true;
-        val_out = default_value;
-        return true;
+        return std::istringstream(pos_args_[ind]);
     }
 
     //////////////////////////////////////////////////////////////////////////
