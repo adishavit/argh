@@ -18,6 +18,66 @@ TEST_CASE("Test empty cmdl")
     CHECK(cmdl("xxx").str().empty());
 }
 
+TEST_CASE("Test positional access")
+{
+    parser cmdl; 
+    char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    cmdl.parse(argc, argv);
+    CHECK(5 == cmdl.size());
+    for (auto parg : cmdl)
+        CHECK(!parg.empty());
+    
+    CHECK(cmdl[0] == "0");
+    CHECK(cmdl[1] == "1");
+    CHECK(cmdl[2] == "2");
+    CHECK(cmdl[3] == "3");
+    CHECK(cmdl[4] == "4");
+    CHECK(cmdl[argc + 10].empty());
+
+    int val = -1;
+    CHECK((cmdl(0) >> val));
+    CHECK(val == 0);
+    CHECK((cmdl(1) >> val));
+    CHECK(val == 1);
+    CHECK((cmdl(2) >> val));
+    CHECK(val == 2);
+    CHECK((cmdl(3) >> val));
+    CHECK(val == 3);
+    CHECK((cmdl(4) >> val));
+    CHECK(val == 4);
+    CHECK(!(cmdl(5) >> val));
+    CHECK(val == 4);
+}
+
+TEST_CASE("Test flag access")
+{
+    parser cmdl;
+    char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    cmdl.parse(argc, argv);
+    CHECK(2 == cmdl.flags_count());
+    CHECK(5 == cmdl.size());
+
+
+    CHECK(cmdl["a"]);
+    CHECK(cmdl["b"]);
+    CHECK(!cmdl["c"]);
+}
+
+TEST_CASE("Test parameter access")
+{
+    parser cmdl;
+    char* argv[] = { "0", "-a", "-1", "-b", "2", "3", "4" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
+    CHECK(2 == cmdl.params_count());
+    CHECK(3 == cmdl.size());
+
+    CHECK(cmdl("a").str() == "-1");
+    CHECK(cmdl("b").str() == "2");
+}
+
 TEST_CASE("Test negative numbers are not options")
 {
     char* argv[] = { "-1", "-0", "-0.4", "-1e6", "-1.3e-2" };
@@ -28,8 +88,6 @@ TEST_CASE("Test negative numbers are not options")
     CHECK(0 == cmdl.params_count());
     CHECK(0 == cmdl.flags_count());
 }
-
-
 
 TEST_CASE("Test un-reg option modes")
 {
@@ -68,5 +126,6 @@ TEST_CASE("Test un-reg option modes")
         CHECK(cmdl["e"]);
     }
 }
+
 
 

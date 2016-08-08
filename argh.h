@@ -106,7 +106,8 @@ namespace argh
             // PREFER_PARAM_FOR_UNREG_OPTION: a non-registered 'name' is determined a parameter, the next arg
             //                                will be the value of that option.
 
-            if (registeredParams_.find(name) != registeredParams_.end())
+            if (registeredParams_.find(name) != registeredParams_.end() || 
+                argh::parser::PREFER_PARAM_FOR_UNREG_OPTION == mode)
             {
                 params_.insert({ name, args_[i + 1] });
                 ++i; // skip next value, it is not a free parameter
@@ -117,11 +118,6 @@ namespace argh
             {
             case argh::parser::PREFER_FLAG_FOR_UNREG_OPTION:
                 flags_.emplace(name);
-                break;
-            case argh::parser::PREFER_PARAM_FOR_UNREG_OPTION:
-                params_.insert({ name, args_[i + 1] });
-                break;
-            default:
                 break;
             }
 
