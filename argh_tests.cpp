@@ -9,7 +9,7 @@ TEST_CASE("Test empty cmdl")
 {
     parser cmdl;
     cmdl.parse(0, nullptr);
-    CHECK(0 == cmdl.size());
+    CHECK(0 == cmdl.pos_args().size());
     CHECK(cmdl[0].empty());
     CHECK(cmdl(0).str().empty());
     CHECK(cmdl[10].empty());
@@ -24,8 +24,8 @@ TEST_CASE("Test positional access")
     const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
     int argc = sizeof(argv) / sizeof(argv[0]);
     cmdl.parse(argc, argv);
-    CHECK(5 == cmdl.size());
-    for (auto parg : cmdl)
+    CHECK(5 == cmdl.pos_args().size());
+    for (auto parg : cmdl.pos_args())
         CHECK(!parg.empty());
     
     CHECK(cmdl[0] == "0");
@@ -56,8 +56,8 @@ TEST_CASE("Test flag access")
     const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
     int argc = sizeof(argv) / sizeof(argv[0]);
     cmdl.parse(argc, argv);
-    CHECK(2 == cmdl.flags_count());
-    CHECK(5 == cmdl.size());
+    CHECK(2 == cmdl.flags().size());
+    CHECK(5 == cmdl.pos_args().size());
 
 
     CHECK(cmdl["a"]);
@@ -71,8 +71,8 @@ TEST_CASE("Test parameter access")
     const char* argv[] = { "0", "-a", "-1", "-b", "2", "3", "4" };
     int argc = sizeof(argv) / sizeof(argv[0]);
     cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
-    CHECK(2 == cmdl.params_count());
-    CHECK(3 == cmdl.size());
+    CHECK(2 == cmdl.params().size());
+    CHECK(3 == cmdl.pos_args().size());
 
     CHECK(cmdl("a").str() == "-1");
     CHECK(cmdl("b").str() == "2");
@@ -84,12 +84,12 @@ TEST_CASE("Test negative numbers are not options")
     int argc = sizeof(argv)/sizeof(argv[0]);
     parser cmdl;
     cmdl.parse(argc, argv);
-    CHECK(argc == cmdl.size());
-    CHECK(0 == cmdl.params_count());
-    CHECK(0 == cmdl.flags_count());
+    CHECK(argc == cmdl.pos_args().size());
+    CHECK(0 == cmdl.params().size());
+    CHECK(0 == cmdl.flags().size());
 }
 
-TEST_CASE("Test default value technique")
+TEST_CASE("Test failed istream access")
 {
     const char* argv[] = { "-string", "Hello" };
     int argc = sizeof(argv) / sizeof(argv[0]);

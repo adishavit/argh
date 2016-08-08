@@ -37,12 +37,12 @@ int main(int argc, const char* argv[])
     cout << fval << endl;
 
     cout << "Flags:\n";
-    for (auto it = cmdl.flags_begin(); it != cmdl.flags_end(); ++it)
-        cout << "\t" << *it << endl;
+    for (auto& flag : cmdl.flags())
+        cout << "\t" << flag << endl;
 
     cout << "Options:\n";
-    for (auto it = cmdl.params_begin(); it != cmdl.params_end(); ++it)
-        cout << "\t" << it->first << " = " << it->second << endl;
+    for (auto& param : cmdl.params())
+        cout << "\t" << param.first << " = " << param.second << endl;
 
     int k = -1;
     if (cmdl(1) >> k)
@@ -51,11 +51,11 @@ int main(int argc, const char* argv[])
         cout << "Could not convert first arg :-(  : '" << cmdl[1] << "', k == " << k << endl;
 
     cout << "Free args:\n";
-    for (auto const& pos_arg : cmdl)
+    for (auto& pos_arg : cmdl.pos_args())
         cout << "\t" << pos_arg << endl;
 
     cout << "Free args 2:\n";
-    for (int i=0; i<cmdl.size(); ++i)
+    for (int i=0; i<cmdl.pos_args().size(); ++i)
         cout << "\t" << cmdl(i).str() << endl;
 
     return EXIT_SUCCESS;

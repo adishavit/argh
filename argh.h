@@ -27,18 +27,9 @@ namespace argh
         void add_param(std::string const& name);
         void parse(int argc, const char* argv[], Mode mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
-        // iteration
-        auto flags_count()       const { return flags_.size();     }
-        auto const flags_begin() const { return flags_.cbegin();   }
-        auto const flags_end()   const { return flags_.cend();     }
-
-        auto params_count()       const { return params_.size();     }
-        auto const params_begin() const { return params_.cbegin();   }
-        auto const params_end()   const { return params_.cend();     }
-
-        auto size()        const { return pos_args_.size();   }
-        auto const begin() const { return pos_args_.cbegin(); }
-        auto const end()   const { return pos_args_.cend();   }
+        auto const& flags()    const { return flags_;    }
+        auto const& params()   const { return params_;   }
+        auto const& pos_args() const { return pos_args_; }
 
         //////////////////////////////////////////////////////////////////////////
         // Accessors
@@ -52,16 +43,19 @@ namespace argh
         // returns a std::istream that can be used to convert a positional arg to a typed value.
         std::istringstream operator()(size_t ind);
 
+        // same as above, but with a default value in case the arg is missing (index out of range).
+        template<typename T>
+        std::istringstream operator()(size_t ind, T&& def_val);
+
         // parameter accessors, give a name get an std::istream that can be used to convert to a typed value.
         // call .str() on result to get as string
         std::istringstream operator()(std::string const& name);
 
-        template<typename T>
-        std::istringstream operator()(size_t ind, T&& def_val);
-
+        // same as above, but with a default value in case the param was missing.
+        // Non-string def_val types must have an operator<<() (output stream operator)
+        // If T only has an input stream operator, pass the string version of the type as in "3" instead of 3.
         template<typename T>
         std::istringstream operator()(std::string const& name, T&& def_val);
-
 
     private:
         std::string trim_leading_dashes(std::string const& name);
