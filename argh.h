@@ -13,7 +13,7 @@ namespace argh
     // Terminology:
     // A command line is composed of 2 types of args:
     // 1. Positional args, i.e. free standing values
-    // 2. Options: args beginnning with '-'. We identify two kinds:
+    // 2. Options: args beginning with '-'. We identify two kinds:
     //    2.1: Flags: boolean options =>  (exist ? true : false)
     //    2.2: Parameters: a name followed by a non-option value
 
@@ -55,6 +55,13 @@ namespace argh
         // parameter accessors, give a name get an std::istream that can be used to convert to a typed value.
         // call .str() on result to get as string
         std::istringstream operator()(std::string const& name);
+
+        template<typename T>
+        std::istringstream operator()(size_t ind, T&& def_val);
+
+        template<typename T>
+        std::istringstream operator()(std::string const& name, T&& def_val);
+
 
     private:
         std::string trim_leading_dashes(std::string const& name);
@@ -180,10 +187,48 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
+    template<typename T>
+    std::istringstream parser::operator()(std::string const& name, T&& def_val)
+    {
+        if (name.empty())
+        {
+            std::ostringstream ostr;
+            ostr << def_val;
+            return std::istringstream(ostr.str());
+        }
+
+        auto optIt = params_.find(trim_leading_dashes(name));
+        if (params_.end() == optIt)
+        {
+            std::ostringstream ostr;
+            ostr << def_val;
+            return std::istringstream(ostr.str());
+        }
+
+        return std::istringstream(optIt->second);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
     std::istringstream parser::operator()(size_t ind)
     {
         if (pos_args_.size() <= ind)
             return std::istringstream();
+
+        return std::istringstream(pos_args_[ind]);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    template<typename T>
+    std::istringstream parser::operator()(size_t ind, T&& def_val)
+    {
+        if (pos_args_.size() <= ind)
+        {
+            std::ostringstream ostr;
+            ostr << def_val;
+            return std::istringstream(ostr.str());
+        }
 
         return std::istringstream(pos_args_[ind]);
     }

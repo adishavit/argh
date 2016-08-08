@@ -150,5 +150,44 @@ TEST_CASE("Test un-reg option modes")
     }
 }
 
+TEST_CASE("Test default value")
+{
+    parser cmdl;
+    const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4", "A", "-c", "B" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
+    int val = -1;
+    CHECK((cmdl(0, 7) >> val));
+    CHECK(0 == val);
+    CHECK((cmdl(argc+1, 7) >> val));
+    CHECK(7 == val);
+    CHECK((cmdl(argc + 1, "7") >> val)); // check default kicks in 
+    CHECK(7 == val);
+
+    val = -1;
+    CHECK(!(cmdl(3, "7") >> val)); // this is an invalid conversion, no default. input error.
+    CHECK((-1 == val || 0 == val));
+
+    val = -1;
+    CHECK((cmdl("XXX", 7) >> val));
+    CHECK(7 == val);
+    CHECK((cmdl("XXX", "8") >> val));
+    CHECK(8 == val);
+    val = -1;
+    CHECK(!(cmdl("XXX", "*") >> val));
+    CHECK((-1 == val || 0 == val));
+
+    CHECK((cmdl("a", 7) >> val));
+    CHECK(1 == val);
+    CHECK((cmdl("b", 7) >> val));
+    CHECK(2 == val);
+
+    val = -1;
+    CHECK(!(cmdl("c", 7) >> val)); // bad conversion
+    CHECK((-1 == val || 0 == val));
+    val = -1;
+    CHECK(!(cmdl("c", "bad-default") >> val));
+    CHECK((-1 == val || 0 == val));
+}
 
