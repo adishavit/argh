@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
 using namespace std;
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
     argh::parser cmdl;
     cmdl.add_param("-f");

@@ -25,7 +25,7 @@ namespace argh
                   };
 
         void add_param(std::string const& name);
-        void parse(int argc, char* argv[], Mode mode = PREFER_FLAG_FOR_UNREG_OPTION);
+        void parse(int argc, const char* argv[], Mode mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
         // iteration
         auto flags_count()       const { return flags_.size();     }
@@ -73,7 +73,7 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
-    void parser::parse(int argc, char* argv[], Mode mode)
+    void parser::parse(int argc, const char* argv[], Mode mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
     {
         // convert to strings
         args_.resize(argc);
@@ -114,13 +114,8 @@ namespace argh
                 continue;
             }
 
-            switch (mode)
-            {
-            case argh::parser::PREFER_FLAG_FOR_UNREG_OPTION:
+            if (argh::parser::PREFER_FLAG_FOR_UNREG_OPTION == mode)
                 flags_.emplace(name);
-                break;
-            }
-
         };
     }
 
@@ -164,7 +159,7 @@ namespace argh
 
     std::string const& parser::operator[](size_t ind)
     {
-        if (0 <= ind && ind < pos_args_.size())
+        if (ind < pos_args_.size())
             return pos_args_[ind];
         return empty_;
     }
