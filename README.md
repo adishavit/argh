@@ -22,19 +22,20 @@ int main(int argc, const char* argv[])
 }
 ```
 ##Terminology
-Any command line is composed of **2** types of *Args*:
-1. ***Positional Args***:
-    Free standing, in-order, values
-    e.g. `config.json`
-3. ***Options***: 
-    Args beginning with `-` (and that are not negative numbers). 
-    We identify ***2*** kinds of *Options*:
-    1. ***Flags***: 
-       Boolean options =>  (appear ? true : false)
-       e.g. `-v`, `--verbose`
-    2. ***Parameters***: 
-       A named value followed by a *non*-option value
-       e.g. `--gamma 2.2`
+Any command line is composed of **2** types of *Args*:  
+
+1. ***Positional Args***:  
+    Free standing, in-order, values  
+    e.g. `config.json`  
+2. ***Options***: 
+    Args beginning with `-` (and that are not negative numbers).   
+    We identify ***2*** kinds of *Options*:  
+    1. ***Flags***:   
+       Boolean options =>  (appear ? true : false)  
+       e.g. `-v`, `--verbose`  
+    2. ***Parameters***:   
+       A named value followed by a *non*-option value  
+       e.g. `--gamma 2.2`  
 
 Thus, any command line can be broken into *(1) positional args* *(2) flags* and *(3) parameters*.
 
@@ -55,7 +56,7 @@ Thus, any command line can be broken into *(1) positional args* *(2) flags* and 
     - Use `operator(index)` to access position arg `istream`: e.g. `cmdl(0) >> my_val`.
     - Use `operator(string)` to access parameter values by name: e.g. `cmdl("scale") >> scale_factor;`
     - Use `operator(index, <default>)` and `operator(string, <default>)` to stream a default value if the arg did not appear on the command line: `cmdl("scale", 1.0f) >> scale_factor;`
-    - The streaming happens at the user's side, so conversion failure can be checked there: 
+    - The streaming happens at the user's side, so conversion failure can be checked there:  
     e.g `if (!(cmdl("scale") >> scale_factor)) cerr << "Must provide valid scale factor! << endl;`
 
 ##Philosophy
