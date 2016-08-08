@@ -191,3 +191,29 @@ TEST_CASE("Test default value")
     CHECK((-1 == val || 0 == val));
 }
 
+TEST_CASE("Leading dashed are stripped")
+{
+    parser cmdl;
+    const char* argv[] = { "-x", "--y", "---z", "-----------w" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    cmdl.parse(argc, argv);
+    CHECK(cmdl["x"]);
+    CHECK(cmdl["-x"]);
+    CHECK(cmdl["--x"]);
+    CHECK(cmdl["---x"]);
+
+    CHECK(cmdl["y"]);
+    CHECK(cmdl["-y"]);
+    CHECK(cmdl["--y"]);
+    CHECK(cmdl["---y"]);
+
+    CHECK(cmdl["z"]);
+    CHECK(cmdl["-z"]);
+    CHECK(cmdl["--z"]);
+    CHECK(cmdl["---z"]);
+
+    CHECK(cmdl["w"]);
+    CHECK(cmdl["-w"]);
+    CHECK(cmdl["--w"]);
+    CHECK(cmdl["---w"]);
+}
