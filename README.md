@@ -58,6 +58,7 @@ Thus, any command line can be broken into *(1) positional args* *(2) flags* and 
     - Use `operator(index, <default>)` and `operator(string, <default>)` to stream a default value if the arg did not appear on the command line: `cmdl("scale", 1.0f) >> scale_factor;`
     - The streaming happens at the user's side, so conversion failure can be checked there:  
     e.g `if (!(cmdl("scale") >> scale_factor)) cerr << "Must provide valid scale factor! << endl;`
+    - Call the `.str()` method to get the parameter value as a string: e.g. `cmdl("name").str();`
 
 ##Philosophy
 Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
