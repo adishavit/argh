@@ -272,4 +272,10 @@ TEST_CASE("Test empty stream")
     CHECK(0  < cmdl("got_eq").rdbuf()->in_avail());
     CHECK(0 == cmdl("empty_eq").rdbuf()->in_avail());
     CHECK(0 == cmdl("xxxxxx").rdbuf()->in_avail());
+
+    // check the stream state directly
+    CHECK( cmdl("got_eq"));
+    CHECK( cmdl("answer"));
+    CHECK( cmdl("empty_eq")); // this will return true but an empty string.
+    CHECK(!cmdl("xxxxxx"));
 }

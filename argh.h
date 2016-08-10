@@ -180,12 +180,14 @@ namespace argh
 
     std::istringstream parser::operator()(std::string const& name)
     {
+        std::istringstream bad_stream;
+        bad_stream.setstate(std::ios_base::failbit);
         if (name.empty())
-            return std::istringstream();
+            return bad_stream;
 
         auto optIt = params_.find(trim_leading_dashes(name));
         if (params_.end() == optIt)
-            return std::istringstream();
+            return bad_stream;
 
         return std::istringstream(optIt->second);
     }
@@ -218,7 +220,11 @@ namespace argh
     std::istringstream parser::operator()(size_t ind)
     {
         if (pos_args_.size() <= ind)
-            return std::istringstream();
+        {
+            std::istringstream bad_stream;
+            bad_stream.setstate(std::ios_base::failbit);
+            return bad_stream;
+        }
 
         return std::istringstream(pos_args_[ind]);
     }
