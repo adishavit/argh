@@ -20,12 +20,13 @@ namespace argh
     class parser
     {
     public:
-        enum Mode { PREFER_FLAG_FOR_UNREG_OPTION, 
-                    PREFER_PARAM_FOR_UNREG_OPTION 
+        enum Mode { PREFER_FLAG_FOR_UNREG_OPTION  = 1 << 0, 
+                    PREFER_PARAM_FOR_UNREG_OPTION = 1 << 1,
+                    NO_SPLIT_ON_EQUALSIGN         = 1 << 2,
                   };
 
         void add_param(std::string const& name);
-        void parse(int argc, const char* argv[], Mode mode = PREFER_FLAG_FOR_UNREG_OPTION);
+        void parse(int argc, const char* argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
         auto const& flags()    const { return flags_;    }
         auto const& params()   const { return params_;   }
@@ -74,7 +75,7 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
-    void parser::parse(int argc, const char* argv[], Mode mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
+    void parser::parse(int argc, const char* argv[], int mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
     {
         // convert to strings
         args_.resize(argc);
@@ -90,6 +91,16 @@ namespace argh
             }
 
             auto name = trim_leading_dashes(args_[i]);
+
+            if (!(mode & NO_SPLIT_ON_EQUALSIGN))
+            {
+                auto equalPos = name.find('=');
+                if (equalPos != std::string::npos)
+                {
+                    params_.insert({ name.substr(0, equalPos), name.substr(equalPos + 1) });
+                    continue;
+                }
+            }
 
             // any potential option will get as its value the next arg, unless that arg is an option too
             // in that case it will be determined a flag.
@@ -108,14 +119,14 @@ namespace argh
             //                                will be the value of that option.
 
             if (registeredParams_.find(name) != registeredParams_.end() || 
-                argh::parser::PREFER_PARAM_FOR_UNREG_OPTION == mode)
+                argh::parser::PREFER_PARAM_FOR_UNREG_OPTION & mode)
             {
                 params_.insert({ name, args_[i + 1] });
                 ++i; // skip next value, it is not a free parameter
                 continue;
             }
 
-            if (argh::parser::PREFER_FLAG_FOR_UNREG_OPTION == mode)
+            if (argh::parser::PREFER_FLAG_FOR_UNREG_OPTION & mode)
                 flags_.emplace(name);
         };
     }
@@ -174,7 +185,7 @@ namespace argh
 
         auto optIt = params_.find(trim_leading_dashes(name));
         if (params_.end() == optIt)
-            return std::istringstream();;
+            return std::istringstream();
 
         return std::istringstream(optIt->second);
     }

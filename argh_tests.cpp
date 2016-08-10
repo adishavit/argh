@@ -217,3 +217,59 @@ TEST_CASE("Leading dashed are stripped")
     CHECK(cmdl["--w"]);
     CHECK(cmdl["---w"]);
 }
+
+TEST_CASE("Split parameter at '='")
+{
+    {
+        parser cmdl;
+        const char* argv[] = { "--answer=42", "---no_val=" };
+        int argc = sizeof(argv) / sizeof(argv[0]);
+        cmdl.parse(argc, argv);
+        CHECK(!cmdl["answer"]);
+        CHECK(cmdl("answer").str() == "42");
+        CHECK(!cmdl["no_val"]);
+        CHECK(cmdl("no_val").str() == "");
+        CHECK(cmdl("no_val").str().empty());
+    }
+    {
+        parser cmdl;
+        const char* argv[] = { "--answer=42" };
+        int argc = sizeof(argv) / sizeof(argv[0]);
+        cmdl.parse(argc, argv, parser::NO_SPLIT_ON_EQUALSIGN | parser::PREFER_FLAG_FOR_UNREG_OPTION);
+        CHECK(!cmdl["answer"]);
+        CHECK(cmdl["answer=42"]);
+        CHECK(!(cmdl("answer").str() == "42"));
+        CHECK(cmdl("answer=42").str().empty());
+    }
+}
+
+TEST_CASE("Test empty stream")
+{
+    parser cmdl;
+    const char* argv[] = { "--answer", "42", "-got_eq=pi", "-empty_eq=" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
+
+    // there are many way to check if the parameter is valid or not:
+
+    // get the underlying string, this assumes an empty string is not possible as input (which is true unless using '--answer=')
+    CHECK(cmdl("answer").str() == "42");
+    CHECK(cmdl("got_eq").str() == "pi");
+    CHECK(cmdl("empty_eq").str() == "");
+    CHECK(cmdl("empty_eq").str().empty());
+    CHECK(cmdl("xxxxxx").str() == "");
+    CHECK(cmdl("xxxxxx").str().empty());
+
+    // stream the value into a variable and check the stream state
+    std::string val;
+    CHECK( (cmdl("answer") >> val));
+    CHECK( (cmdl("got_eq") >> val));
+    CHECK(!(cmdl("xxxxxx") >> val));
+    CHECK(!(cmdl("empty_eq") >> val));
+
+    // access the stream rdbuf available chars to read directly and avoid unnecessary streaming
+    CHECK(0  < cmdl("answer").rdbuf()->in_avail());
+    CHECK(0  < cmdl("got_eq").rdbuf()->in_avail());
+    CHECK(0 == cmdl("empty_eq").rdbuf()->in_avail());
+    CHECK(0 == cmdl("xxxxxx").rdbuf()->in_avail());
+}
