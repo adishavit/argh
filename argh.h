@@ -23,6 +23,7 @@ namespace argh
         enum Mode { PREFER_FLAG_FOR_UNREG_OPTION  = 1 << 0, 
                     PREFER_PARAM_FOR_UNREG_OPTION = 1 << 1,
                     NO_SPLIT_ON_EQUALSIGN         = 1 << 2,
+                    SINGLE_DASH_IS_MULTIFLAG      = 1 << 3,
                   };
 
         void add_param(std::string const& name);
@@ -99,6 +100,17 @@ namespace argh
                 {
                     params_.insert({ name.substr(0, equalPos), name.substr(equalPos + 1) });
                     continue;
+                }
+            }
+
+            // if the option is unregistered and should be a multi-flag
+            if (1 == (args_[i].size() - name.size()) &&                  // single dash
+                argh::parser::SINGLE_DASH_IS_MULTIFLAG & mode &&         // multi-flag mode
+                registeredParams_.find(name) == registeredParams_.end()) // unregistered
+            {
+                for (auto const& c : name)
+                {
+                    flags_.emplace(std::string{ c });
                 }
             }
 

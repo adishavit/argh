@@ -279,3 +279,47 @@ TEST_CASE("Test empty stream")
     CHECK( cmdl("empty_eq")); // this will return true but an empty string.
     CHECK(!cmdl("xxxxxx"));
 }
+
+TEST_CASE("Interpret single-dash arg as multi-flag")
+{
+    const char* argv[] = { "-xvf", "42", "--abc", "54" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    {
+        parser cmdl;
+        cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION | parser::SINGLE_DASH_IS_MULTIFLAG);
+
+        CHECK(cmdl["x"]);
+        CHECK(cmdl["v"]);
+        CHECK(cmdl["f"]);
+
+        CHECK(!cmdl["a"]);
+        CHECK(!cmdl["b"]);
+        CHECK(!cmdl["c"]);
+    }
+    {
+        parser cmdl;
+        cmdl.parse(argc, argv);
+
+        CHECK(cmdl["xvf"]);
+        CHECK(cmdl["abc"]);
+        CHECK(!cmdl["x"]);
+        CHECK(!cmdl["v"]);
+        CHECK(!cmdl["f"]);
+        CHECK(!cmdl["a"]);
+        CHECK(!cmdl["b"]);
+        CHECK(!cmdl["c"]);
+    }
+    {
+        parser cmdl;
+        cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
+
+        CHECK(cmdl("xvf"));
+        CHECK(cmdl("abc"));
+        CHECK(!cmdl["x"]);
+        CHECK(!cmdl["v"]);
+        CHECK(!cmdl["f"]);
+        CHECK(!cmdl["a"]);
+        CHECK(!cmdl["b"]);
+        CHECK(!cmdl["c"]);
+    }
+}
