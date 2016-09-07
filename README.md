@@ -6,7 +6,7 @@
 If you're writing a product quality highly-sophisticated command line tool, then `Boost.Program_options` and its kin should be your go-to tools (you may already even have Boost as a dependency anyway).  
 However, if you need just a few options with minimal fuss give the single header file `argh` a try.
  
-##TL;DR
+## TL;DR
 It doesn't get simpler than this:
 ```cpp
 #include "argh.h"
@@ -21,7 +21,24 @@ int main(int argc, const char* argv[])
     return EXIT_SUCCESS;
 }
 ```
-##Terminology
+## Philosophy
+Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
+
+The API is:
+ - Minimalistic but expressive: 
+    - No getters nor binders
+    - Just bracket`[]` and function`()` operators. 
+    - Easy iteration (range-`for` too).
+ - You don't pay for what you don't use;
+ - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase.
+
+`argh` does not care about:
+ - How many `-` preceded your option;
+ - Which flags and options you support - that is your responsibility;
+ - Syntax validation: *any* command line is a valid combination of positional *parameters*, *flags* and *options*;
+ - Automatically producing a usage message.
+
+## Terminology
 Any command line is composed of **2** types of *Args*:  
 
 1. ***Positional Args***:  
@@ -39,42 +56,55 @@ Any command line is composed of **2** types of *Args*:
 
 Thus, any command line can be broken into *(1) positional args* *(2) flags* and *(3) parameters*.
 
-## Brief API Summary
-- Use `parser::parse(argc, argv[], mode)` to parse the command line; 
-- Parsing modes:
-    - `parser::PREFER_FLAG_FOR_UNREG_OPTION`: Split `<option> <non-option>` into `<flag>` and `<pos_arg>`. 
-    e.g. `myapp -v config.json` will have `v` as a lit flag and `config.json` as a positional arg.
-    *This is the default mode.*
-    - `parser::PREFER_PARAM_FOR_UNREG_OPTION`: Interpret `<option> <non-option>` as `<parameter-name> <parameter-value>`. 
-    e.g. `myapp --gamma 2.2` will have `gamma` as a parameter with the value "2.2".    
+## API Summary
+### Parsing
+Parse the command line using either 
+- The `parse()` method: `parser::parse(argc, argv, mode)`; or 
+- The shorter form using the ctor directly: 
+  `argh::parser cmdl(argc, argv, mode);` 
+
+### Special Parsing Modes
+Extra flexibility can be added be specifying parsing modes:
+- **`parser::NO_SPLIT_ON_EQUALSIGN`**: 
+   By default, an option of the form `--pi=22/7` will be parsed as a *parameter* `pi` with an associated value `"22/7"`. 
+   By setting this mode, it will be not be broken at the `=`.
+- **`parser::PREFER_FLAG_FOR_UNREG_OPTION`**: 
+  Split `<option> <non-option>` into `<flag>` and `<pos_arg>`. 
+  e.g. `myapp -v config.json` will have `v` as a lit flag and `config.json` as a positional arg.
+  *This is the default mode.*
+- **`parser::PREFER_PARAM_FOR_UNREG_OPTION`**: 
+  Interpret `<option> <non-option>` as `<parameter-name> <parameter-value>`. 
+  e.g. `myapp --gamma 2.2` will have `gamma` as a parameter with the value "2.2".
+- **`parser::SINGLE_DASH_IS_MULTIFLAG`**:
+  Splits an option with a *single* dash into separate boolean flags, one for each letter.
+  e.g. in this mode, `-xvf` will be parsed as 3 separate flags: `x`, `v`, `f`.
+
+### Argument Access
+- Use *bracket operators* to access *flags* and *positional* args: 
+    - Use `operator[index]` to access *position* arg strings by *index*: 
+        - e.g. `assert(cmdl[0] == argv[0])`, the app name.
+    - Use `operator[string]` to access boolean *flags* by *name*: 
+        - e.g. `if (cmdl["v"]) make_verbose();`
+
+- Use the *parenthesis operators* to get an `std::istream` to stream values from *paramters* and *positional* args:
+    - Use `operator(index)` to access position arg `istream` by index: 
+        - e.g. `cmdl(0) >> my_app_name`.
+    - Use `operator(string)` to access *parameter* values by *name*: 
+        - e.g. `cmdl("scale") >> scale_factor;`
+    - Use `operator(index, <default>)` and `operator(string, <default>)` to stream a default value if the arg did not appear on the command line: 
+        - e.g. `cmdl("scale", 1.0f) >> scale_factor;`
+
+The streaming happens at the user's side, so conversion failure can be checked there: 
+e.g 
+   
+```cpp
+if (!(cmdl("scale") >> scale_factor))   
+  cerr << "Must provide valid scale factor! << endl;
+```
+   
+Use the `.str()` method to get the parameter value as a string: e.g. `cmdl("name").str();`
+
+### More Methods
 - Use `parser::add_param()` to *optionally* pre-register a parameter name when in `PREFER_FLAG_FOR_UNREG_OPTION` mode.
 - Use `parser::pos_args()`, `parser::flags()` and `parser::params()` to access and iterate over the Arg containers directly.
-- Use *bracket operators* to access flags and positional args: 
-    - Use `operator[index]` to access position arg strings: e.g. `cmdl[0] == argv[0]`, the app name.
-    - Use `operator[string]` to access boolean flags by name: e.g. `if (cmdl["v"]) make_verbose();`
-- Use the *function call operators* to get an `std::istream` to stream values from paramters and positional args:
-    - Use `operator(index)` to access position arg `istream`: e.g. `cmdl(0) >> my_val`.
-    - Use `operator(string)` to access parameter values by name: e.g. `cmdl("scale") >> scale_factor;`
-    - Use `operator(index, <default>)` and `operator(string, <default>)` to stream a default value if the arg did not appear on the command line: `cmdl("scale", 1.0f) >> scale_factor;`
-    - The streaming happens at the user's side, so conversion failure can be checked there:  
-    e.g `if (!(cmdl("scale") >> scale_factor)) cerr << "Must provide valid scale factor! << endl;`
-    - Call the `.str()` method to get the parameter value as a string: e.g. `cmdl("name").str();`
 
-##Philosophy
-Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
-
-The API is:
- - Minimalistic but expressive: 
-    - No getters nor binders
-    - Just bracket`[]` and function`()` operators. 
-    - Easy iteration (range-`for` too).
- - You don't pay for what you don't use;
- - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase.
-
-`argh` does not care about:
- - How many `-` preceded your option;
- - Which flags and options you support - that is your responsibility;
- - Syntax validation: *any* command line is a valid combination of positional *parameters*, *flags* and *options*;
- - Automatically producing a usage message.
-
- 
