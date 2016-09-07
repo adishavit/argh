@@ -27,10 +27,11 @@ Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approac
 The API is:
  - Minimalistic but expressive: 
     - No getters nor binders
-    - Just bracket`[]` and function`()` operators. 
+    - Just the `[]` and `()` operators. 
     - Easy iteration (range-`for` too).
  - You don't pay for what you don't use;
- - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase.
+ - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase;
+ - No exceptions thrown for failures.
 
 `argh` does not care about:
  - How many `-` preceded your option;
@@ -71,13 +72,13 @@ if (!cmdl(10))
 else if (cmdl(11))   
   cout << "11th argument  is: " << cmdl[11] << endl;
 ```
-But we can also set default values for positional arguments. These passed as the second argument:
+But we can also set default values for positional arguments. These are passed as the second argument:
 ```cpp
 float scale_facor;
 cmdl(2, 1.0f) >> scale_factor;
      ^^^^^^^
 ```
-If the position argument was not given or the streaming conversion failed, the default value will be used.
+If the position argument was not given or the streaming conversion failed, the default value will be used.  
 Similarly, parameters can be accessed by (string) name with `(<std::string> [, <default value>])`:
 ```cpp
 float scale_facor;
@@ -91,6 +92,21 @@ else                                                                        ^^^^
   cout << "Threshold set to: " << threshold << endl;  
 ```
 As shown above, use `std::istream::str()` to get the param value as a `std:string` or just stream the value into a variable of a suitable type. Standard stream state indicates failure, including when the argument was not given. 
+
+Positional arguments, flags and parameters are accessible as ranges:
+```cpp
+cout << "Positional args:\n";
+for (auto& pos_arg : cmdl.pos_args())
+  cout << '\t' << pos_arg << endl;
+
+cout << "\nFlags:\n";
+for (auto& flag : cmdl.flags())
+  cout << '\t' << flag << endl;
+
+cout << "\nParameters:\n";
+for (auto& param : cmdl.params())
+  cout << '\t' << param.first << " : " << param.second << endl;
+```
 
 ### Tips
 - By default, arguments of the form `--<name>=<value>` (with no spaces), e.g. `--answer=42`, will be parsed as `<parameter-name> <parameter-value>`.  
