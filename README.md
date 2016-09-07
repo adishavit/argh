@@ -7,13 +7,13 @@ If you're writing a product quality highly-sophisticated command line tool, then
 However, if you need just a few options with minimal fuss give the single header file `argh` a try.
  
 ##TL;DR
+It doesn't get simpler than this:
 ```cpp
 #include "argh.h"
 
 int main(int argc, const char* argv[])
 {
-    argh::parser cmdl
-    cmdl.parse(argc, argv);
+    argh::parser cmdl(argc, argv);
 
     if (cmdl["-v"])
         std::cout << "Verbose, I am." << std::endl;
