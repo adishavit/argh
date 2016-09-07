@@ -26,6 +26,12 @@ namespace argh
                     SINGLE_DASH_IS_MULTIFLAG      = 1 << 3,
                   };
 
+        parser() = default;
+        parser(int argc, const char* argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION)
+        {
+           parse(argc, argv, mode);
+        }
+
         void add_param(std::string const& name);
         void parse(int argc, const char* argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
