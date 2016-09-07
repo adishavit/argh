@@ -7,7 +7,7 @@ If you're writing a product quality highly-sophisticated command line tool, then
 However, if you need just a few options with minimal fuss give the single header file `argh` a try.
  
 ## TL;DR
-It doesn't get simpler than this:
+It doesn't get much simpler than this:
 ```cpp
 #include "argh.h"
 
@@ -65,17 +65,17 @@ Parse the command line using either
 
 ### Special Parsing Modes
 Extra flexibility can be added be specifying parsing modes:
-- **`parser::NO_SPLIT_ON_EQUALSIGN`**: 
+- **`parser::NO_SPLIT_ON_EQUALSIGN`**:  
    By default, an option of the form `--pi=22/7` will be parsed as a *parameter* `pi` with an associated value `"22/7"`. 
    By setting this mode, it will be not be broken at the `=`.
-- **`parser::PREFER_FLAG_FOR_UNREG_OPTION`**: 
+- **`parser::PREFER_FLAG_FOR_UNREG_OPTION`**:  
   Split `<option> <non-option>` into `<flag>` and `<pos_arg>`. 
   e.g. `myapp -v config.json` will have `v` as a lit flag and `config.json` as a positional arg.
   *This is the default mode.*
-- **`parser::PREFER_PARAM_FOR_UNREG_OPTION`**: 
+- **`parser::PREFER_PARAM_FOR_UNREG_OPTION`**:  
   Interpret `<option> <non-option>` as `<parameter-name> <parameter-value>`. 
   e.g. `myapp --gamma 2.2` will have `gamma` as a parameter with the value "2.2".
-- **`parser::SINGLE_DASH_IS_MULTIFLAG`**:
+- **`parser::SINGLE_DASH_IS_MULTIFLAG`**:  
   Splits an option with a *single* dash into separate boolean flags, one for each letter.
   e.g. in this mode, `-xvf` will be parsed as 3 separate flags: `x`, `v`, `f`.
 
