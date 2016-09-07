@@ -38,6 +38,65 @@ The API is:
  - Syntax validation: *any* command line is a valid combination of positional *parameters*, *flags* and *options*;
  - Automatically producing a usage message.
 
+## Tutorial
+Create parser:
+```cpp
+auto cmdl = argh::parser(argc, argv);    
+``` 
+Positional argument access by (integer) index with `[<size_t>]`:
+```cpp
+cout << "Exe name is: " << cmdl[0] << endl;
+                               ^^^
+assert(cmdl[10000].empty()); // out-of-bound index returns empty string
+            ^^^^^
+``` 
+Boolean flag argument access by (string) name with `[<std::string>]`:
+```cpp
+cout << "Verbose mode is " << ( cmdl["verbose"] ? "ON" : "OFF" ) << endl; 
+                                    ^^^^^^^^^^^
+``` 
+Beyond `bool` and `std::string` access with `[]`, as shown above, we can also access the argument values as an `std::istream`. This is very useful for type conversions. 
+
+`std::istream` positional argument access by (integer) index with `(<size_t>)`:
+```cpp
+std::string my_app_name;
+cmdl(0) >> my_app_name; // streaming into a string
+    ^^^
+cout << "Exe name is: " << my_app_name << endl;
+```
+We can also check if a particular positional arg was given or not (this is like using `[<std::string>]` above):
+```cpp
+if (!cmdl(10))   
+  cerr << "Must provide at least 10 arguments! << endl;
+else if (cmdl(11))   
+  cout << "11th argument  is: " << cmdl[11] << endl;
+```
+But we can also set default values for positional arguments. These passed as the second argument:
+```cpp
+float scale_facor;
+cmdl(2, 1.0f) >> scale_factor;
+     ^^^^^^^
+```
+If the position argument was not given or the streaming conversion failed, the default value will be used.
+Similarly, parameters can be accessed by (string) name with `(<std::string> [, <default value>])`:
+```cpp
+float scale_facor;
+cmdl("scale", 1.0f) >> scale_factor; // Use 1.0f as default value
+     ^^^^^^^^^^^^^
+
+float threshold;
+if (!(cmdl("threshold") >> theshold)) // Check for missing param and/or bad (inconvertible) param value
+  cerr << "Must provide a valid threshold value! Got '" << cmdl("threshold").str() << "'" << endl;                                
+else                                                                        ^^^^^^  
+  cout << "Threshold set to: " << threshold << endl;  
+```
+As shown above, use `std::istream::str()` to get the param value as a `std:string` or just stream the value into a variable of a suitable type. Standard stream state indicates failure, including when the argument was not given. 
+
+### Tips
+- By default, arguments of the form `--<name>=<value>` (with no spaces), e.g. `--answer=42`, will be parsed as `<parameter-name> <parameter-value>`.  
+To disable this specify the **`NO_SPLIT_ON_EQUALSIGN`** mode.
+- Specifying the **`SINGLE_DASH_IS_MULTIFLAG`** mode will split a single-hyphen argument into multiple single-character flags (as is common in various POSIX tools).
+
 ## Terminology
 Any command line is composed of **2** types of *Args*:  
 
@@ -65,17 +124,17 @@ Parse the command line using either
 
 ### Special Parsing Modes
 Extra flexibility can be added be specifying parsing modes:
-- **`parser::NO_SPLIT_ON_EQUALSIGN`**:  
+- **`NO_SPLIT_ON_EQUALSIGN`**:  
    By default, an option of the form `--pi=22/7` will be parsed as a *parameter* `pi` with an associated value `"22/7"`. 
    By setting this mode, it will be not be broken at the `=`.
-- **`parser::PREFER_FLAG_FOR_UNREG_OPTION`**:  
+- **`PREFER_FLAG_FOR_UNREG_OPTION`**:  
   Split `<option> <non-option>` into `<flag>` and `<pos_arg>`. 
   e.g. `myapp -v config.json` will have `v` as a lit flag and `config.json` as a positional arg.
   *This is the default mode.*
-- **`parser::PREFER_PARAM_FOR_UNREG_OPTION`**:  
+- **`PREFER_PARAM_FOR_UNREG_OPTION`**:  
   Interpret `<option> <non-option>` as `<parameter-name> <parameter-value>`. 
   e.g. `myapp --gamma 2.2` will have `gamma` as a parameter with the value "2.2".
-- **`parser::SINGLE_DASH_IS_MULTIFLAG`**:  
+- **`SINGLE_DASH_IS_MULTIFLAG`**:  
   Splits an option with a *single* dash into separate boolean flags, one for each letter.
   e.g. in this mode, `-xvf` will be parsed as 3 separate flags: `x`, `v`, `f`.
 
