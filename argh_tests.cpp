@@ -57,6 +57,13 @@ TEST_CASE("Test positional access")
     CHECK(cmdl[4] == "4");
     CHECK(cmdl[argc + 10].empty());
 
+    CHECK(cmdl(0));
+    CHECK(cmdl(1));
+    CHECK(cmdl(2));
+    CHECK(cmdl(3));
+    CHECK(cmdl(4));
+    CHECK(!cmdl(argc + 10));
+
     int val = -1;
     CHECK((cmdl(0) >> val));
     CHECK(val == 0);
@@ -273,6 +280,12 @@ TEST_CASE("Test empty stream")
     cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
     // there are many way to check if the parameter is valid or not:
+    CHECK(cmdl("answer"));
+    CHECK(cmdl("got_eq"));
+    CHECK(cmdl("empty_eq"));
+    CHECK(cmdl("empty_eq"));
+    CHECK(!cmdl("xxxxxx"));
+    CHECK(!cmdl("xxxxxx"));
 
     // get the underlying string, this assumes an empty string is not possible as input (which is true unless using '--answer=')
     CHECK(cmdl("answer").str() == "42");
