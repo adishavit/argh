@@ -108,6 +108,29 @@ for (auto& param : cmdl.params())
   cout << '\t' << param.first << " : " << param.second << endl;
 ```
 
+By default options are assumed to be boolean flags. 
+When this is not what you want, there are several ways to specify when an option is a parameter with an associated value.  
+
+1. Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <non-option>` as `<parameter-name> <parameter-value>`:
+```cpp
+using namespace argh;
+auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+std::cout << cmdl("threshold").str() << std::endl;
+```
+2. Pre-register an expected parameter name:
+```cpp
+argh::parser cmdl;
+cmdl.add_param("threshold"); // pre-register "threshold" as a param: name + value
+cmdl.parse(argc, argv);
+std::cout << cmdl("threshold").str() << std::endl;
+```
+3. Use a `=` (with no spaces around it) within the option when *calling* the app:
+```cpp
+>> my_app --threshold=42
+42
+```
+
 ### Tips
 - By default, arguments of the form `--<name>=<value>` (with no spaces), e.g. `--answer=42`, will be parsed as `<parameter-name> <parameter-value>`.
 To disable this specify the **`NO_SPLIT_ON_EQUALSIGN`** mode.
@@ -129,7 +152,7 @@ Any command line is composed of **2** types of *Args*:
        A named value followed by a *non*-option value
        e.g. `--gamma 2.2`
 
-Thus, any command line can be broken into *(1) positional args* *(2) flags* and *(3) parameters*.
+Thus, any command line can always be broken into some combination of *(1) positional args* *(2) flags* and *(3) parameters*.  
 
 ## API Summary
 ### Parsing
