@@ -111,21 +111,21 @@ for (auto& param : cmdl.params())
 By default options are assumed to be boolean flags. 
 When this is not what you want, there are several ways to specify when an option is a parameter with an associated value.  
 
-1. Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <non-option>` as `<parameter-name> <parameter-value>`:
+Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <non-option>` as `<parameter-name> <parameter-value>`:
 ```cpp
 using namespace argh;
 auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 std::cout << cmdl("threshold").str() << std::endl;
 ```
-2. Pre-register an expected parameter name:
+Pre-register an expected parameter name:
 ```cpp
 argh::parser cmdl;
 cmdl.add_param("threshold"); // pre-register "threshold" as a param: name + value
 cmdl.parse(argc, argv);
 std::cout << cmdl("threshold").str() << std::endl;
 ```
-3. Use a `=` (with no spaces around it) within the option when *calling* the app:
+Use a `=` (with no spaces around it) within the option when *calling* the app:
 ```cpp
 >> my_app --threshold=42
 42
