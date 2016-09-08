@@ -115,7 +115,7 @@ When this is not what you want, there are several ways to specify when an option
 ```cpp
 using namespace argh;
 auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
-                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 std::cout << cmdl("threshold").str() << std::endl;
 ```
 2. Pre-register an expected parameter name:
