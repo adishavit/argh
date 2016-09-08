@@ -78,7 +78,7 @@ float scale_facor;
 cmdl(2, 1.0f) >> scale_factor;
      ^^^^^^^
 ```
-If the position argument was not given or the streaming conversion failed, the default value will be used.
+If the position argument was not given or the streaming conversion failed, the default value will be used.  
 Similarly, parameters can be accessed by (string) name with `(<std::string> [, <default value>])`:
 ```cpp
 float scale_facor;
