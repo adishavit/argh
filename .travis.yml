@@ -1,0 +1,27 @@
+language: cpp
+
+addons:
+  # these apt sources will be referenced later (by using *name)
+  apt:
+    sources: &apt_sources
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.5
+      - llvm-toolchain-precise-3.6
+      - llvm-toolchain-precise-3.7
+      - llvm-toolchain-precise-3.8
+      - llvm-toolchain-precise
+matrix:
+  include:
+
+    # GCC 5
+    - env: COMPILER=g++-5
+      compiler: gcc
+      addons: &gcc5
+        apt:
+          packages: ["g++-5",   "valgrind", "g++-5-multilib",   "libc6-dbg", "libc6-dbg:i386"]
+          sources: *apt_sources
+
+script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
