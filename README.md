@@ -1,10 +1,11 @@
-# *"Argh! A minimalist argument handler!"*
 > *Argh! Why does simple command line processing need to be such a pain!*
 
-*Argh!* So many different command line processing libraries out there and none of them just work! Some bring their whole extended family of related and unrelated external dependencies, some require quirky syntax and/or very verbose setups that sacrifice simplicity for the generation of a cute usage message and validation. Others do not build on multiple plaforms - for some even their own tests and trivial usage cause crashes on some systems. *Argh!*
+So many different command line processing libraries out there and none of them just work!  
+Some bring their whole extended family of related and unrelated external dependencies (looking at you Boost).  
+Some require quirky syntax and/or very verbose setups that sacrifice simplicity for the generation of a cute usage message and validation. Many come to dominate your `main()` file and yet others do not build on multiple plaforms - for some even their own tests and trivial usage cause crashes on some systems. *Argh!*
 
-If you're writing a highly-sophisticated command line tool, then `Boost.Program_options` and its kin should be your go-to tools (you may already even have Boost as a dependency anyway).
-However, if you need just a few options with minimal fuss give the single header file `argh` a try.
+If you're writing a highly-sophisticated command line tool, then `Boost.Program_options` and its kin might give you many advanced options.  
+However, if you need to get up and running quickly, effectively and with minimal fuss give the single header-file `argh` a try.
 
 ## TL;DR
 It doesn't get much simpler than this:
