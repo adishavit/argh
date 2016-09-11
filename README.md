@@ -44,7 +44,7 @@ The API is:
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 [![Standard](https://img.shields.io/badge/C%2B%2B-14-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](http://melpon.org/wandbox/permlink/ralxPN49F7cUY2yw)
+[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](http://melpon.org/wandbox/permlink/ralxPN49F7cUY2yw)  
 [![Build Status](https://travis-ci.org/adishavit/argh.svg?branch=master)](https://travis-ci.org/adishavit/argh)
 
 ## Tutorial
