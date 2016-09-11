@@ -32,7 +32,8 @@ The API is:
  - You don't pay for what you don't use;
  - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase;
  - No exceptions thrown for failures.
- - Liberal BSD license
+ - Liberal BSD license;
+ - No non-`std` dependencies. 
 
 `argh` does not care about:
  - How many `-` preceded your option;
