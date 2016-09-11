@@ -21,6 +21,12 @@ int main(int argc, const char* argv[])
     return EXIT_SUCCESS;
 }
 ```
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
+[![Standard](https://img.shields.io/badge/C%2B%2B-14-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](http://melpon.org/wandbox/permlink/ralxPN49F7cUY2yw)  
+[![Build Status](https://travis-ci.org/adishavit/argh.svg?branch=master)](https://travis-ci.org/adishavit/argh)
+
 ## Philosophy
 Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
 
@@ -40,12 +46,6 @@ The API is:
  - Which flags and options you support - that is your responsibility;
  - Syntax validation: *any* command line is a valid combination of positional *parameters*, *flags* and *options*;
  - Automatically producing a usage message.
-
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
-[![Standard](https://img.shields.io/badge/C%2B%2B-14-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
-[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](http://melpon.org/wandbox/permlink/ralxPN49F7cUY2yw)  
-[![Build Status](https://travis-ci.org/adishavit/argh.svg?branch=master)](https://travis-ci.org/adishavit/argh)
 
 ## Tutorial
 Create parser:
