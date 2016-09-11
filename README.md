@@ -40,6 +40,9 @@ The API is:
  - Syntax validation: *any* command line is a valid combination of positional *parameters*, *flags* and *options*;
  - Automatically producing a usage message.
 
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
+[![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 ## Tutorial
 Create parser:
 ```cpp
