@@ -358,3 +358,36 @@ TEST_CASE("Interpret single-dash arg as multi-flag")
         CHECK(!cmdl["c"]);
     }
 }
+
+
+TEST_CASE("Handles const char versions as expected")
+{
+   {    
+      const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      auto cmdl = parser(argc, argv);
+      CHECK(5 == cmdl.pos_args().size());
+      CHECK(2 == cmdl.flags().size());
+   }
+   {    
+      char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      auto cmdl = parser(argc, argv);
+      CHECK(5 == cmdl.pos_args().size());
+      CHECK(2 == cmdl.flags().size());
+   }
+   {
+      char * const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      auto cmdl = parser(argc, argv);
+      CHECK(5 == cmdl.pos_args().size());
+      CHECK(2 == cmdl.flags().size());
+   }
+   {
+      char const* const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      auto cmdl = parser(argc, argv);
+      CHECK(5 == cmdl.pos_args().size());
+      CHECK(2 == cmdl.flags().size());
+   }
+}
