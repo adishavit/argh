@@ -35,9 +35,9 @@ namespace argh
         void add_param(std::string const& name);
         void parse(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
-        auto const& flags()    const { return flags_;    }
-        auto const& params()   const { return params_;   }
-        auto const& pos_args() const { return pos_args_; }
+        std::multiset<std::string>          const& flags()    const { return flags_;    }
+        std::map<std::string, std::string>  const& params()   const { return params_;   }
+        std::vector<std::string>            const& pos_args() const { return pos_args_; }
 
         //////////////////////////////////////////////////////////////////////////
         // Accessors
@@ -86,7 +86,7 @@ namespace argh
     {
         // convert to strings
         args_.resize(argc);
-        std::transform(argv, argv+argc, args_.begin(), [](auto arg) { return arg;  });
+        std::transform(argv, argv+argc, args_.begin(), [](const char* const arg) { return arg;  });
 
         // parse line
         for (auto i=0u; i < args_.size(); ++i)
