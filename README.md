@@ -27,7 +27,7 @@ int main(int argc, const char* argv[])
 
     return EXIT_SUCCESS;
 }
-```
+``` 
 ## Philosophy
 Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
 
@@ -40,6 +40,7 @@ The API is:
  - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase;
  - No exceptions thrown for failures.
  - Liberal BSD license;
+ - Single header file;
  - No non-`std` dependencies. 
 
 `argh` does not care about:
