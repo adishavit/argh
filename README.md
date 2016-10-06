@@ -1,4 +1,11 @@
-> *Argh! Why does simple command line processing need to be such a pain!*
+#*Argh!*
+> *Why does simple command line processing need to be such a pain!*
+
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
+[![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](http://melpon.org/wandbox/permlink/ralxPN49F7cUY2yw)
+[![Build Status](https://travis-ci.org/adishavit/argh.svg?branch=master)](https://travis-ci.org/adishavit/argh)
 
 So many different command line processing libraries out there and none of them just work!  
 Some bring their whole extended family of related and unrelated external dependencies (*yes, I'm looking at you Boost*).  
@@ -21,12 +28,6 @@ int main(int argc, const char* argv[])
     return EXIT_SUCCESS;
 }
 ```
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
-[![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
-[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](http://melpon.org/wandbox/permlink/ralxPN49F7cUY2yw)  
-[![Build Status](https://travis-ci.org/adishavit/argh.svg?branch=master)](https://travis-ci.org/adishavit/argh)
-
 ## Philosophy
 Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
 
