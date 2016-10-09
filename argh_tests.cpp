@@ -391,3 +391,14 @@ TEST_CASE("Handles const char versions as expected")
       CHECK(2 == cmdl.flags().size());
    }
 }
+
+
+TEST_CASE("Handles options with spaces")
+{
+    parser cmdl;
+    const char* argv[] = { "0 1 2 3 4", "-a -b -c" };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    cmdl.parse(argc, argv);
+    CHECK(1 == cmdl.pos_args().size());
+    CHECK(1 == cmdl.flags().size());
+}
