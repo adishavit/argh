@@ -17,6 +17,47 @@ namespace argh
     //    2.1: Flags: boolean options =>  (exist ? true : false)
     //    2.2: Parameters: a name followed by a non-option value
 
+    // Until GCC 5, istringstream did not have a move constructor.
+    // parameterstream_impl is used instead, as a workaround.
+    class parameterstream_impl
+    {
+    public:
+      parameterstream_impl() = default;
+
+      // Construct with a value.
+      parameterstream_impl(std::string parameter_value);
+
+      // Copy constructor.
+      parameterstream_impl(const parameterstream_impl&);
+
+      void setstate(std::ios_base::iostate);
+
+      // Stream out the value of the parameter.
+      // If the conversion was not possible, the stream will enter the fail state,
+      // and operator bool will return false.
+      template<typename T>
+      parameterstream_impl& operator >> (T&);
+
+      // Get the string value.
+      std::string str() const;
+
+      std::stringbuf* rdbuf() const;
+
+      // Check the state of the stream. 
+      // False when the most recent stream operation failed
+      operator bool() const;
+
+      ~parameterstream_impl() = default;
+    private:
+      std::istringstream stream_;
+    };
+
+#if !defined(__GNUC__) || (__GNUC__ >= 5)
+    using parameterstream = std::istringstream;
+#else
+    using parameterstream = parameterstream_impl;
+#endif
+
     class parser
     {
     public:
@@ -49,23 +90,24 @@ namespace argh
         std::string const& operator[](size_t ind);
 
         // returns a std::istream that can be used to convert a positional arg to a typed value.
-        std::istringstream operator()(size_t ind);
+        parameterstream operator()(size_t ind);
 
         // same as above, but with a default value in case the arg is missing (index out of range).
         template<typename T>
-        std::istringstream operator()(size_t ind, T&& def_val);
+        parameterstream operator()(size_t ind, T&& def_val);
 
         // parameter accessors, give a name get an std::istream that can be used to convert to a typed value.
         // call .str() on result to get as string
-        std::istringstream operator()(std::string const& name);
+        parameterstream operator()(std::string const& name);
 
         // same as above, but with a default value in case the param was missing.
         // Non-string def_val types must have an operator<<() (output stream operator)
         // If T only has an input stream operator, pass the string version of the type as in "3" instead of 3.
         template<typename T>
-        std::istringstream operator()(std::string const& name, T&& def_val);
+        parameterstream operator()(std::string const& name, T&& def_val);
 
     private:
+        parameterstream bad_stream() const;
         std::string trim_leading_dashes(std::string const& name);
         bool is_number(std::string const& arg);
         bool is_option(std::string const& arg);
@@ -151,6 +193,15 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
+    parameterstream parser::bad_stream() const
+    {
+        parameterstream bad;
+        bad.setstate(std::ios_base::failbit);
+        return bad;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
     bool parser::is_number(std::string const& arg)
     {
         // inefficient but simple way to determine if a string is a number (which can start with a '-')
@@ -196,30 +247,28 @@ namespace argh
 
     //////////////////////////////////////////////////////////////////////////
 
-    std::istringstream parser::operator()(std::string const& name)
+    parameterstream parser::operator()(std::string const& name)
     {
-        std::istringstream bad_stream;
-        bad_stream.setstate(std::ios_base::failbit);
         if (name.empty())
-            return bad_stream;
+            return bad_stream();
 
         auto optIt = params_.find(trim_leading_dashes(name));
         if (params_.end() == optIt)
-            return bad_stream;
+            return bad_stream();
 
-        return std::istringstream(optIt->second);
+        return parameterstream(optIt->second);
     }
 
     //////////////////////////////////////////////////////////////////////////
 
     template<typename T>
-    std::istringstream parser::operator()(std::string const& name, T&& def_val)
+    parameterstream parser::operator()(std::string const& name, T&& def_val)
     {
         if (name.empty())
         {
             std::ostringstream ostr;
             ostr << def_val;
-            return std::istringstream(ostr.str());
+            return parameterstream(ostr.str());
         }
 
         auto optIt = params_.find(trim_leading_dashes(name));
@@ -227,39 +276,37 @@ namespace argh
         {
             std::ostringstream ostr;
             ostr << def_val;
-            return std::istringstream(ostr.str());
+            return parameterstream(ostr.str());
         }
 
-        return std::istringstream(optIt->second);
+        return parameterstream(optIt->second);
     }
 
     //////////////////////////////////////////////////////////////////////////
 
-    std::istringstream parser::operator()(size_t ind)
+    parameterstream parser::operator()(size_t ind)
     {
         if (pos_args_.size() <= ind)
         {
-            std::istringstream bad_stream;
-            bad_stream.setstate(std::ios_base::failbit);
-            return bad_stream;
+          return bad_stream();
         }
 
-        return std::istringstream(pos_args_[ind]);
+        return parameterstream(pos_args_[ind]);
     }
 
     //////////////////////////////////////////////////////////////////////////
 
     template<typename T>
-    std::istringstream parser::operator()(size_t ind, T&& def_val)
+    parameterstream parser::operator()(size_t ind, T&& def_val)
     {
         if (pos_args_.size() <= ind)
         {
             std::ostringstream ostr;
             ostr << def_val;
-            return std::istringstream(ostr.str());
+            return parameterstream(ostr.str());
         }
 
-        return std::istringstream(pos_args_[ind]);
+        return parameterstream(pos_args_[ind]);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -270,6 +317,57 @@ namespace argh
     }
 
     //////////////////////////////////////////////////////////////////////////
+
+    parameterstream_impl::parameterstream_impl(std::string value)
+      : stream_(value)
+    {
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    parameterstream_impl::parameterstream_impl(const parameterstream_impl& other)
+      : stream_(other.stream_.str())
+    {
+        stream_.setstate(other.stream_.rdstate());
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    void parameterstream_impl::setstate(std::ios_base::iostate state)
+    {
+        stream_.setstate(state);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    std::stringbuf* parameterstream_impl::rdbuf() const
+    {
+        return stream_.rdbuf();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    parameterstream_impl::operator bool() const
+    {
+        return !!stream_;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    template <typename T>
+    parameterstream_impl& parameterstream_impl::operator>> (T& thing)
+    {
+        stream_ >> thing;
+        return *this;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    
+    std::string parameterstream_impl::str() const
+    {
+        return stream_.str();
+    }
+
 }
 
 
