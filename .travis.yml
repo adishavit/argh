@@ -29,6 +29,30 @@ matrix:
           packages: ["g++-4.9", "valgrind", "g++-4.9-multilib", "libc6-dbg", "libc6-dbg:i386"]
           sources: *apt_sources
 
+    # GCC 4.8
+    - env: COMPILER=g++-4.8
+      compiler: gcc
+      addons: &gcc48
+        apt:
+          packages: ["g++-4.8", "valgrind", "g++-4.8-multilib", "libc6-dbg", "libc6-dbg:i386"]
+          sources: *apt_sources
+
+    # GCC 4.7
+    - env: COMPILER=g++-4.7 
+      compiler: gcc
+      addons: &gcc47
+        apt:
+          packages: ["g++-4.7", "valgrind", "g++-4.7-multilib", "libc6-dbg", "libc6-dbg:i386"]
+          sources: *apt_sources
+
+    # GCC 4.6
+    - env: COMPILER=g++-4.6 
+      compiler: gcc
+      addons: &gcc46
+        apt:
+          packages: ["g++-4.6", "valgrind", "g++-4.6-multilib", "libc6-dbg", "libc6-dbg:i386"]
+          sources: *apt_sources
+
 script:
   - mkdir build
   - cd build
