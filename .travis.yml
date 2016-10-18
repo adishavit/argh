@@ -21,6 +21,14 @@ matrix:
           packages: ["g++-5",   "valgrind", "g++-5-multilib",   "libc6-dbg", "libc6-dbg:i386"]
           sources: *apt_sources
 
+    # GCC 4.9
+    - env: COMPILER=g++-4.9 
+      compiler: gcc
+      addons: &gcc49
+        apt:
+          packages: ["g++-4.9", "valgrind", "g++-4.9-multilib", "libc6-dbg", "libc6-dbg:i386"]
+          sources: *apt_sources
+
 script:
   - mkdir build
   - cd build
