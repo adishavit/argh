@@ -77,4 +77,4 @@ matrix:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make && argh_tests
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make && ./argh_tests
