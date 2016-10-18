@@ -12,6 +12,14 @@ addons:
       - llvm-toolchain-precise
 matrix:
   include:
+  
+    # GCC 6
+    - env: COMPILER=g++-6 ADDITIONAL_CXX_FLAGS=" -fuse-ld=gold"
+      compiler: gcc
+      addons: &gcc6
+        apt:
+          packages: ["g++-6",   "valgrind", "g++-6-multilib",   "libc6-dbg", "libc6-dbg:i386"]
+          sources: *apt_sources
 
     # GCC 5
     - env: COMPILER=g++-5
@@ -29,7 +37,44 @@ matrix:
           packages: ["g++-4.9", "valgrind", "g++-4.9-multilib", "libc6-dbg", "libc6-dbg:i386"]
           sources: *apt_sources
 
+    # GCC 4.8
+    - env: COMPILER=g++-4.8
+      compiler: gcc
+      addons: &gcc48
+        apt:
+          packages: ["g++-4.8", "valgrind", "g++-4.8-multilib", "libc6-dbg", "libc6-dbg:i386"]
+          sources: *apt_sources
+
+    # Clang 3.5
+    - env: COMPILER=clang++-3.5 
+      addons: &clang35
+        apt:
+          packages: ["clang-3.5", "valgrind", "g++-multilib", "libc6-dbg", "libc6-dbg:i386", "g++-6"]
+          sources: *apt_sources
+
+    # Clang 3.6
+    - env: COMPILER=clang++-3.6 
+      addons: &clang36
+        apt:
+          packages: ["clang-3.6", "valgrind", "g++-multilib", "libc6-dbg", "libc6-dbg:i386", "g++-6"]
+          sources: *apt_sources
+
+    # Clang 3.7
+    - env: COMPILER=clang++-3.7
+      addons: &clang37
+        apt:
+          packages: ["clang-3.7", "valgrind", "g++-multilib", "libc6-dbg", "libc6-dbg:i386", "g++-6"]
+          sources: *apt_sources
+
+    # Clang 3.8
+    - env: COMPILER=clang++-3.8 
+      addons: &clang38
+        apt:
+          packages: ["clang-3.8", "valgrind", "g++-multilib", "libc6-dbg", "libc6-dbg:i386", "g++-6"]
+          sources: *apt_sources
+
+
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make && ./argh_tests
