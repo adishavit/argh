@@ -78,7 +78,7 @@ cout << "Exe name is: " << my_app_name << endl;
 We can also check if a particular positional arg was given or not (this is like using `[<std::string>]` above):
 ```cpp
 if (!cmdl(10))
-  cerr << "Must provide at least 10 arguments! << endl;
+  cerr << "Must provide at least 10 arguments!" << endl;
 else if (cmdl(11))
   cout << "11th argument  is: " << cmdl[11] << endl;
 ```
@@ -207,7 +207,7 @@ e.g
 
 ```cpp
 if (!(cmdl("scale") >> scale_factor))
-  cerr << "Must provide valid scale factor! << endl;
+  cerr << "Must provide valid scale factor!" << endl;
 ```
 
 Use the `.str()` method to get the parameter value as a string: e.g. `cmdl("name").str();`
