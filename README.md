@@ -118,7 +118,7 @@ for (auto& param : cmdl.params())
   cout << '\t' << param.first << " : " << param.second << endl;
 ```
 
-By default options are assumed to be boolean flags. 
+By default, options are assumed to be boolean flags. 
 When this is not what you want, there are several ways to specify when an option is a parameter with an associated value.  
 
 Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <non-option>` as `<parameter-name> <parameter-value>`:
@@ -142,25 +142,25 @@ Use a `=` (with no spaces around it) within the option when *calling* the app:
 ```
 
 ### Tips
-- By default, arguments of the form `--<name>=<value>` (with no spaces), e.g. `--answer=42`, will be parsed as `<parameter-name> <parameter-value>`.
+- By default, arguments of the form `--<name>=<value>` (with no spaces, one or more dashes), e.g. `--answer=42`, will be parsed as `<parameter-name> <parameter-value>`.
 To disable this specify the **`NO_SPLIT_ON_EQUALSIGN`** mode.
 - Specifying the **`SINGLE_DASH_IS_MULTIFLAG`** mode will split a single-hyphen argument into multiple single-character flags (as is common in various POSIX tools).
 
 ## Terminology
 Any command line is composed of **2** types of *Args*:
 
-1. ***Positional Args***:
-    Free standing, in-order, values
-    e.g. `config.json`
-2. ***Options***:
-    Args beginning with `-` (and that are not negative numbers).
-    We identify ***2*** kinds of *Options*:
-    1. ***Flags***:
-       Boolean options =>  (appear ? true : false)
-       e.g. `-v`, `--verbose`
-    2. ***Parameters***:
-       A named value followed by a *non*-option value
-       e.g. `--gamma 2.2`
+1. ***Positional Args***:  
+    Free standing, in-order, values  
+    e.g. `config.json`  
+2. ***Options***:  
+    Args beginning with `-` (and that are not negative numbers).  
+    We identify ***2*** kinds of *Options*:  
+    1. ***Flags***:  
+       Boolean options =>  (appear ? true : false)  
+       e.g. `-v`, `--verbose`  
+    2. ***Parameters***:  
+       A named value followed by a *non*-option value  
+       e.g. `--gamma 2.2`  
 
 Thus, any command line can always be broken into some combination of *(1) positional args* *(2) flags* and *(3) parameters*.  
 
