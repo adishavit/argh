@@ -392,17 +392,20 @@ TEST_CASE("Handles const char versions as expected")
    }
 }
 
+
+template <typename T>
+void test(int argc, T&& argv)
+{
+   auto cmdl = parser(argc, argv);
+   CHECK(5 == cmdl.pos_args().size());
+   CHECK(2 == cmdl.flags().size());
+};
+
+
 TEST_CASE("Handles char** const versions as expected")
 {
    char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
    int argc = sizeof(argv) / sizeof(argv[0]);
-
-   auto test = [argc](auto argv)
-   {
-      auto cmdl = parser(argc, argv);
-      CHECK(5 == cmdl.pos_args().size());
-      CHECK(2 == cmdl.flags().size());
-   };
 
    char const * const * const argvp_ccc = argv;
 
@@ -413,14 +416,14 @@ TEST_CASE("Handles char** const versions as expected")
    char       * const *       argvp_c1  = argv;
    char       *       * const argvp_c2  = argv;
 
-   test(argvp_ccc);
+   test(argc, argvp_ccc);
 
-   test(argvp_cc0);
-   test(argvp_cc1);
-// test(argvp_cc2);
-// test(argvp_c0);
-   test(argvp_c1);
-   test(argvp_c2);
+   test(argc, argvp_cc0);
+   test(argc, argvp_cc1);
+// test(argc, argvp_cc2);
+// test(argc, argvp_c0);
+   test(argc, argvp_c1);
+   test(argc, argvp_c2);
 }
 
 
