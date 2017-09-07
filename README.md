@@ -18,9 +18,9 @@ It doesn't get much simpler than this:
 ```cpp
 #include "argh.h"
 
-int main(int argc, const char* argv[])
+int main(int, char* argv[])
 {
-    argh::parser cmdl(argc, argv);
+    argh::parser cmdl(argv);
 
     if (cmdl["-v"])
         std::cout << "Verbose, I am." << std::endl;
@@ -54,6 +54,11 @@ Create parser:
 ```cpp
 auto cmdl = argh::parser(argc, argv);
 ```
+In fact, you can even drop `argc`. This will also work:  
+```cpp
+argh::parser cmdl(argv);
+```
+
 Positional argument access by (integer) index with `[<size_t>]`:
 ```cpp
 cout << "Exe name is: " << cmdl[0] << endl;
@@ -167,9 +172,11 @@ Thus, any command line can always be broken into some combination of *(1) positi
 ## API Summary
 ### Parsing
 Parse the command line using either
-- The `parse()` method: `parser::parse(argc, argv, mode)`; or
+- The `parse()` method: `parser::parse([argc,] argv [, mode])`; or
 - The shorter form using the ctor directly:
-  `argh::parser cmdl(argc, argv, mode);`
+  `argh::parser([argc,] argv [, mode]);`
+- The shortest form does not even require `argc`, so in default `mode` just use:   
+  `parser(argv);`
 
 ### Special Parsing Modes
 Extra flexibility can be added be specifying parsing modes:

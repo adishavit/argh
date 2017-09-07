@@ -433,3 +433,18 @@ TEST_CASE("Handles options with spaces")
     CHECK(1 == cmdl.pos_args().size());
     CHECK(1 == cmdl.flags().size());
 }
+
+TEST_CASE("Test parser with no argc")
+{
+   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4", nullptr };
+   int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+   CHECK(nullptr == argv[argc]);
+   parser cmdl(argv);
+   CHECK(2 == cmdl.flags().size());
+   CHECK(5 == cmdl.pos_args().size());
+
+
+   CHECK(cmdl["a"]);
+   CHECK(cmdl["b"]);
+   CHECK(!cmdl["c"]);
+}

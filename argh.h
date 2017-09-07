@@ -78,12 +78,15 @@ namespace argh
                 };
 
       parser() = default;
+      parser(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION)
+      {  parse(argv, mode); }
+
       parser(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION)
-      {
-         parse(argc, argv, mode);
-      }
+      {  parse(argc, argv, mode); }
 
       void add_param(std::string const& name);
+
+      void parse(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
       void parse(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
       std::multiset<std::string>          const& flags()    const { return flags_; }
@@ -133,6 +136,18 @@ namespace argh
 
 
    //////////////////////////////////////////////////////////////////////////
+
+
+   inline void parser::parse(const char * const argv[], int mode)
+   {
+      int argc = 0;
+      for (auto argvp = argv; *argvp; ++argc, ++argvp);
+      parse(argc, argv, mode);
+   }
+
+
+   //////////////////////////////////////////////////////////////////////////
+
 
    void parser::parse(int argc, const char* const argv[], int mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
    {
