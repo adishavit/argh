@@ -238,4 +238,4 @@ Use the `.str()` method to get the parameter value as a string: e.g. `cmdl("name
 - Use `parser::pos_args()`, `parser::flags()` and `parser::params()` to access and iterate over the Arg containers directly.
 
 ## Colophon
-I ❤ your feedback. If you found Argh! useful - do [Tweet](http://twitter.com/share?text=I'm using Argh! the minimalist C++ argument handler by @adishavit&url=https://github.com/adishavit/argh) about it to let [me](https://twitter.com/AdiShavit) know. If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).
+I ❤ your feedback. If you found Argh! useful - do Tweet about it to let [me](https://twitter.com/AdiShavit) know. If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).
