@@ -255,7 +255,7 @@ namespace argh
    std::string parser::trim_leading_dashes(std::string const& name)
    {
       auto pos = name.find_first_not_of('-');
-      return name.substr(pos);
+      return std::string::npos != pos ? name.substr(pos) : name;
    }
 
    //////////////////////////////////////////////////////////////////////////
@@ -294,9 +294,6 @@ namespace argh
 
    string_stream parser::operator()(std::string const& name)
    {
-      if (name.empty())
-         return bad_stream();
-
       auto optIt = params_.find(trim_leading_dashes(name));
       if (params_.end() == optIt)
          return bad_stream();
@@ -309,13 +306,6 @@ namespace argh
    template<typename T>
    string_stream parser::operator()(std::string const& name, T&& def_val)
    {
-      if (name.empty())
-      {
-         std::ostringstream ostr;
-         ostr << def_val;
-         return string_stream(ostr.str());
-      }
-
       auto optIt = params_.find(trim_leading_dashes(name));
       if (params_.end() == optIt)
       {

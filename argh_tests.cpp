@@ -446,7 +446,6 @@ TEST_CASE("Test parser with no argc")
    CHECK(2 == cmdl.flags().size());
    CHECK(5 == cmdl.pos_args().size());
 
-
    CHECK(cmdl["a"]);
    CHECK(cmdl["b"]);
    CHECK(!cmdl["c"]);
@@ -467,4 +466,16 @@ TEST_CASE("Test initializer list for flags")
 
       CHECK(cmdl[{"c", "b", "a"}]);
    }
+}
+
+TEST_CASE("Test empty string access")
+{
+   parser cmdl;
+   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+   int argc = sizeof(argv) / sizeof(argv[0]);
+   cmdl.parse(argc, argv);
+
+   CHECK(!cmdl[""]);
+   CHECK(!cmdl(""));
+   CHECK(cmdl("",42).str() == "42");
 }
