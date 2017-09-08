@@ -22,7 +22,7 @@ int main(int, char* argv[])
 {
     argh::parser cmdl(argv);
 
-    if (cmdl["-v"])
+    if (cmdl[{ "-v", "--verbose" }])
         std::cout << "Verbose, I am." << std::endl;
 
     return EXIT_SUCCESS;
@@ -210,13 +210,17 @@ Extra flexibility can be added be specifying parsing modes:
         - e.g. `assert(cmdl[0] == argv[0])`, the app name.
     - Use `operator[string]` to access boolean *flags* by *name*:
         - e.g. `if (cmdl["v"]) make_verbose();`
-
-- Use the *parenthesis operators* to get an `std::istream` to stream values from *paramters* and *positional* args:
+    - Use `operator[{...}]` to access boolean *flags* by *multiple names*:
+        - e.g. `if (cmdl[{ "v", "verbose" }]) make_verbose();`
+  
+- Use the *parenthesis operators* to get an `std::istream` to stream values from *parameters* and *positional* args:
     - Use `operator(index)` to access position arg `istream` by index:
         - e.g. `cmdl(0) >> my_app_name`.
     - Use `operator(string)` to access *parameter* values by *name*:
         - e.g. `cmdl("scale") >> scale_factor;`
-    - Use `operator(index, <default>)` and `operator(string, <default>)` to stream a default value if the arg did not appear on the command line:
+    - Use `operator({...})` to access *parameter* values by *multiple names*:
+        - e.g. `cmdl({ "-s", "--scale" }) >> scale_factor;`        
+    - Use `operator(index, <default>)` and `operator(string/{list}, <default>)` to stream a default value if the arg did not appear on the command line:
         - e.g. `cmdl("scale", 1.0f) >> scale_factor;`
 
 The streaming happens at the user's side, so conversion failure can be checked there:
@@ -233,3 +237,5 @@ Use the `.str()` method to get the parameter value as a string: e.g. `cmdl("name
 - Use `parser::add_param()` to *optionally* pre-register a parameter name when in `PREFER_FLAG_FOR_UNREG_OPTION` mode.
 - Use `parser::pos_args()`, `parser::flags()` and `parser::params()` to access and iterate over the Arg containers directly.
 
+## Colophon
+I ❤ your feedback. If you found Argh! useful - do [Tweet](http://twitter.com/share?text=I'm using Argh! the minimalist C++ argument handler by @adishavit&url=https://github.com/adishavit/argh) about it to let [me](https://twitter.com/AdiShavit) know. If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).
