@@ -76,7 +76,7 @@ Any dashes are trimmed so are not required.
 Your flag can have several alternatives, just list them with `[{ "<name-1>", "<name-2>", ... }]`:
 ```cpp
 cout << "Verbose mode is " << ( cmdl[{ "-v", "--verbose" }] ? "ON" : "OFF" ) << endl;
-                                    ^^^^^^^^^^^^^^^^^^^^
+                                    ^^^^^^^^^^^^^^^^^^^^^^^
 ```
 Beyond `bool` and `std::string` access with `[]`, as shown above, we can also access the argument values as an `std::istream`. This is very useful for type conversions.
 
