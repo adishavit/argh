@@ -99,7 +99,7 @@ namespace argh
       // flag (boolean) accessors: return true if the flag appeared, otherwise false.
       bool operator[](std::string const& name);
 
-      // flag (boolean) accessors: return true if at least one of the flag appeared, otherwise false.
+      // multiple flag (boolean) accessors: return true if at least one of the flag appeared, otherwise false.
       bool operator[](std::initializer_list<char const* const> init_list);
 
       // returns positional arg string by order. Like argv[] but without the options
@@ -116,11 +116,20 @@ namespace argh
       // call .str() on result to get as string
       string_stream operator()(std::string const& name);
 
+      // accessor for a parameter with multiple names, give a list of names, get an std::istream that can be used to convert to a typed value.
+      // call .str() on result to get as string
+      // returns the first value in the list to be found.
+      string_stream operator()(std::initializer_list<char const* const> init_list);
+
       // same as above, but with a default value in case the param was missing.
       // Non-string def_val types must have an operator<<() (output stream operator)
       // If T only has an input stream operator, pass the string version of the type as in "3" instead of 3.
       template<typename T>
       string_stream operator()(std::string const& name, T&& def_val);
+
+      // same as above but for a list of names. returns the first value to be found.
+      template<typename T>
+      string_stream operator()(std::initializer_list<char const* const> init_list, T&& def_val);
 
    private:
       string_stream bad_stream() const;
@@ -295,10 +304,22 @@ namespace argh
    string_stream parser::operator()(std::string const& name)
    {
       auto optIt = params_.find(trim_leading_dashes(name));
-      if (params_.end() == optIt)
-         return bad_stream();
+      if (params_.end() != optIt)
+         return string_stream(optIt->second);
+      return bad_stream();
+   }
 
-      return string_stream(optIt->second);
+   //////////////////////////////////////////////////////////////////////////
+
+   string_stream parser::operator()(std::initializer_list<char const* const> init_list)
+   {
+      for (auto& name : init_list)
+      {
+         auto optIt = params_.find(trim_leading_dashes(name));
+         if (params_.end() != optIt)
+            return string_stream(optIt->second);
+      }
+      return bad_stream();
    }
 
    //////////////////////////////////////////////////////////////////////////
@@ -307,15 +328,31 @@ namespace argh
    string_stream parser::operator()(std::string const& name, T&& def_val)
    {
       auto optIt = params_.find(trim_leading_dashes(name));
-      if (params_.end() == optIt)
-      {
-         std::ostringstream ostr;
-         ostr << def_val;
-         return string_stream(ostr.str());
-      }
+      if (params_.end() != optIt)
+         return string_stream(optIt->second);
 
-      return string_stream(optIt->second);
+      std::ostringstream ostr;
+      ostr << def_val;
+      return string_stream(ostr.str()); // use default
    }
+
+   //////////////////////////////////////////////////////////////////////////
+
+   // same as above but for a list of names. returns the first value to be found.
+   template<typename T>
+   string_stream parser::operator()(std::initializer_list<char const* const> init_list, T&& def_val)
+   {
+      for (auto& name : init_list)
+      {
+         auto optIt = params_.find(trim_leading_dashes(name));
+         if (params_.end() != optIt)
+            return string_stream(optIt->second);
+      }      
+      std::ostringstream ostr;
+      ostr << def_val;
+      return string_stream(ostr.str()); // use default
+   }
+
 
    //////////////////////////////////////////////////////////////////////////
 

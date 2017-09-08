@@ -453,16 +453,18 @@ TEST_CASE("Test parser with no argc")
 
 TEST_CASE("Test initializer list for flags")
 {
-   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4", "-x=10" };
    int argc = sizeof(argv) / sizeof(argv[0]);
    {
       parser cmdl(argc, argv);
       CHECK(cmdl[{"a"}]);
       CHECK(cmdl[{"b"}]);
       CHECK(!cmdl[{"c"}]);
+      CHECK(!cmdl[{"x"}]);
 
       CHECK(cmdl[{"a","1","moo","Meow"}]);
       CHECK(!cmdl[{"1","moo","Meow"}]);
+      CHECK(!cmdl[{"x", "moo", "Meow"}]);
 
       CHECK(cmdl[{"c", "b", "a"}]);
    }
@@ -479,3 +481,48 @@ TEST_CASE("Test empty string access")
    CHECK(!cmdl(""));
    CHECK(cmdl("",42).str() == "42");
 }
+
+TEST_CASE("Test initializer list for params")
+{
+   const char* argv[] = { "-a=1", "-b=2", nullptr };
+   parser cmdl(argv);
+
+   CHECK(!cmdl[{"a"}]); // a and b are params. not flags
+   CHECK(!cmdl[{"b"}]);
+   CHECK(!cmdl[{"c"}]);
+
+   CHECK(cmdl({"a"})); 
+   CHECK(cmdl({"b"}));
+   CHECK(!cmdl({"c"}));
+
+   CHECK(cmdl({ "a", "x", "y" }).str() == "1");
+   CHECK(cmdl({ "b", "x", "y" }).str() == "2");
+   CHECK(cmdl({ "x", "a", "y" }).str() == "1");
+   CHECK(cmdl({ "y", "x", "b" }).str() == "2");
+
+   // gets first value
+   CHECK(cmdl({ "a", "b" }).str() == "1");
+   CHECK(cmdl({ "b", "a" }).str() == "2");
+
+   // handles empty strings
+   CHECK(!cmdl({ "" }));
+   CHECK(cmdl({ "", "a" }));
+   CHECK(cmdl({ "a", "" }));
+}
+
+TEST_CASE("Test initializer list for params with default values")
+{
+   const char* argv[] = { "-a=1", "-b=2", nullptr };
+   parser cmdl(argv);
+
+   CHECK(!cmdl({ "c" }));
+   CHECK(cmdl({ "c" }, 1));
+   CHECK(cmdl({ "c" }, 1).str() == "1");
+   CHECK(cmdl({ "c","d","e" }, 1));
+   CHECK(cmdl({ "c","d","e" }, 1).str() == "1");
+
+   // handles empty strings
+   CHECK(cmdl({ "" }, 1));
+   CHECK(cmdl({ "" }, 1).str() == "1");
+}
+
