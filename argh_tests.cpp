@@ -451,3 +451,20 @@ TEST_CASE("Test parser with no argc")
    CHECK(cmdl["b"]);
    CHECK(!cmdl["c"]);
 }
+
+TEST_CASE("Test initializer list for flags")
+{
+   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+   int argc = sizeof(argv) / sizeof(argv[0]);
+   {
+      parser cmdl(argc, argv);
+      CHECK(cmdl[{"a"}]);
+      CHECK(cmdl[{"b"}]);
+      CHECK(!cmdl[{"c"}]);
+
+      CHECK(cmdl[{"a","1","moo","Meow"}]);
+      CHECK(!cmdl[{"1","moo","Meow"}]);
+
+      CHECK(cmdl[{"c", "b", "a"}]);
+   }
+}

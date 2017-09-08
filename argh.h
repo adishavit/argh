@@ -99,6 +99,9 @@ namespace argh
       // flag (boolean) accessors: return true if the flag appeared, otherwise false.
       bool operator[](std::string const& name);
 
+      // flag (boolean) accessors: return true if at least one of the flag appeared, otherwise false.
+      bool operator[](std::initializer_list<char const* const> init_list);
+
       // returns positional arg string by order. Like argv[] but without the options
       std::string const& operator[](size_t ind);
 
@@ -124,6 +127,7 @@ namespace argh
       std::string trim_leading_dashes(std::string const& name);
       bool is_number(std::string const& arg);
       bool is_option(std::string const& arg);
+      bool got_flag(std::string const& name);
 
    private:
       std::vector<std::string> args_;
@@ -256,9 +260,25 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::operator[](std::string const& name)
+
+   bool argh::parser::got_flag(std::string const& name)
    {
       return flags_.end() != flags_.find(trim_leading_dashes(name));
+   }
+
+
+   //////////////////////////////////////////////////////////////////////////
+
+   bool parser::operator[](std::string const& name)
+   {
+      return got_flag(name);
+   }
+
+   //////////////////////////////////////////////////////////////////////////
+
+   bool parser::operator[](std::initializer_list<char const* const> init_list)
+   {
+      return std::any_of(init_list.begin(), init_list.end(), [&](char const* const name) { return got_flag(name); });
    }
 
    //////////////////////////////////////////////////////////////////////////
