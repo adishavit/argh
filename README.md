@@ -71,6 +71,13 @@ Boolean flag argument access by (string) name with `[<std::string>]`:
 cout << "Verbose mode is " << ( cmdl["verbose"] ? "ON" : "OFF" ) << endl;
                                     ^^^^^^^^^^^
 ```
+Any dashes are trimmed so are not required.  
+
+Your flag can have several alternatives, just list them with `[{ "<name-1>", "<name-2>", ... }]`:
+```cpp
+cout << "Verbose mode is " << ( cmdl[{ "-v", "--verbose" }] ? "ON" : "OFF" ) << endl;
+                                    ^^^^^^^^^^^^^^^^^^^^
+```
 Beyond `bool` and `std::string` access with `[]`, as shown above, we can also access the argument values as an `std::istream`. This is very useful for type conversions.
 
 `std::istream` positional argument access by (integer) index with `(<size_t>)`:
@@ -94,19 +101,22 @@ cmdl(2, 1.0f) >> scale_factor;
      ^^^^^^^
 ```
 If the position argument was not given or the streaming conversion failed, the default value will be used.  
-Similarly, parameters can be accessed by (string) name with `(<std::string> [, <default value>])`:
+
+Similarly, parameters can be accessed by name(s) (i.e. by string or list of string literals) with:  
+`(<std::string> [, <default value>])` or   `({ "<name-1>", "<name-2>", ... } [, <default value>])`:  
 ```cpp
 float scale_facor;
 cmdl("scale", 1.0f) >> scale_factor; // Use 1.0f as default value
      ^^^^^^^^^^^^^
 
 float threshold;
-if (!(cmdl("threshold") >> theshold)) // Check for missing param and/or bad (inconvertible) param value
+if (!(cmdl({ "-t", "--threshold"}) >> theshold)) // Check for missing param and/or bad (inconvertible) param value
   cerr << "Must provide a valid threshold value! Got '" << cmdl("threshold").str() << "'" << endl;
 else                                                                        ^^^^^^
   cout << "Threshold set to: " << threshold << endl;
 ```
-As shown above, use `std::istream::str()` to get the param value as a `std:string` or just stream the value into a variable of a suitable type. Standard stream state indicates failure, including when the argument was not given.
+As shown above, use `std::istream::str()` to get the param value as a `std:string` or just stream the value into a variable of a suitable type. Standard stream state indicates failure, including when the argument was not given.  
+When using multiple names, the first value found will be returned.
 
 Positional arguments, flags and parameters are accessible as ranges:
 ```cpp
@@ -131,7 +141,7 @@ Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <n
 using namespace argh;
 auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-std::cout << cmdl("threshold").str() << std::endl;
+std::cout << cmdl("--threshold").str() << std::endl;
 ```
 Pre-register an expected parameter name:
 ```cpp
