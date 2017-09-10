@@ -526,3 +526,17 @@ TEST_CASE("Test initializer list for params with default values")
    CHECK(cmdl({ "" }, 1).str() == "1");
 }
 
+
+TEST_CASE("Test positional access via range for")
+{
+   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4", nullptr };
+   parser cmdl(argv);
+   CHECK(5 == cmdl.pos_args().size());
+
+   int i = 0;
+   for (auto arg : cmdl)
+   {
+      CHECK(!arg.empty());
+      CHECK(arg == std::to_string(i++));
+   }
+}

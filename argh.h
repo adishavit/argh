@@ -93,6 +93,10 @@ namespace argh
       std::map<std::string, std::string>  const& params()   const { return params_; }
       std::vector<std::string>            const& pos_args() const { return pos_args_; }
 
+      // begin() and end() for using range-for over positional args.
+      std::vector<std::string>::const_iterator begin() { return pos_args_.cbegin(); }
+      std::vector<std::string>::const_iterator end()   { return pos_args_.cend();    }
+
       //////////////////////////////////////////////////////////////////////////
       // Accessors
 
