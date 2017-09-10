@@ -118,7 +118,13 @@ else                                                                        ^^^^
 As shown above, use `std::istream::str()` to get the param value as a `std:string` or just stream the value into a variable of a suitable type. Standard stream state indicates failure, including when the argument was not given.  
 When using multiple names, the first value found will be returned.
 
-Positional arguments, flags and parameters are accessible as ranges:
+Positional arguments can be iterated upon directly using *range-for*:
+```cpp
+cout << "Positional args:\n";
+for (auto& pos_arg : cmdl)
+  cout << '\t' << pos_arg << '\n';
+```
+Positional arguments, flags *and* parameters are accessible as "ranges":
 ```cpp
 cout << "Positional args:\n";
 for (auto& pos_arg : cmdl.pos_args())
