@@ -23,7 +23,7 @@ int main(int, char* argv[])
     argh::parser cmdl(argv);
 
     if (cmdl[{ "-v", "--verbose" }])
-        std::cout << "Verbose, I am." << std::endl;
+        std::cout << "Verbose, I am." << '\n';
 
     return EXIT_SUCCESS;
 }
@@ -61,21 +61,21 @@ argh::parser cmdl(argv);
 
 Positional argument access by (integer) index with `[<size_t>]`:
 ```cpp
-cout << "Exe name is: " << cmdl[0] << endl;
+cout << "Exe name is: " << cmdl[0] << '\n';
                                ^^^
 assert(cmdl[10000].empty()); // out-of-bound index returns empty string
             ^^^^^
 ```
 Boolean flag argument access by (string) name with `[<std::string>]`:
 ```cpp
-cout << "Verbose mode is " << ( cmdl["verbose"] ? "ON" : "OFF" ) << endl;
+cout << "Verbose mode is " << ( cmdl["verbose"] ? "ON" : "OFF" ) << '\n';
                                     ^^^^^^^^^^^
 ```
 Any dashes are trimmed so are not required.  
 
 Your flag can have several alternatives, just list them with `[{ "<name-1>", "<name-2>", ... }]`:
 ```cpp
-cout << "Verbose mode is " << ( cmdl[{ "-v", "--verbose" }] ? "ON" : "OFF" ) << endl;
+cout << "Verbose mode is " << ( cmdl[{ "-v", "--verbose" }] ? "ON" : "OFF" ) << '\n';
                                     ^^^^^^^^^^^^^^^^^^^^^^^
 ```
 Beyond `bool` and `std::string` access with `[]`, as shown above, we can also access the argument values as an `std::istream`. This is very useful for type conversions.
@@ -85,14 +85,14 @@ Beyond `bool` and `std::string` access with `[]`, as shown above, we can also ac
 std::string my_app_name;
 cmdl(0) >> my_app_name; // streaming into a string
     ^^^
-cout << "Exe name is: " << my_app_name << endl;
+cout << "Exe name is: " << my_app_name << '\n';
 ```
 We can also check if a particular positional arg was given or not (this is like using `[<std::string>]` above):
 ```cpp
 if (!cmdl(10))
-  cerr << "Must provide at least 10 arguments!" << endl;
+  cerr << "Must provide at least 10 arguments!" << '\n';
 else if (cmdl(11))
-  cout << "11th argument  is: " << cmdl[11] << endl;
+  cout << "11th argument  is: " << cmdl[11] << '\n';
 ```
 But we can also set default values for positional arguments. These are passed as the second argument:
 ```cpp
@@ -113,7 +113,7 @@ float threshold;
 if (!(cmdl({ "-t", "--threshold"}) >> theshold)) // Check for missing param and/or bad (inconvertible) param value
   cerr << "Must provide a valid threshold value! Got '" << cmdl("threshold").str() << "'" << endl;
 else                                                                        ^^^^^^
-  cout << "Threshold set to: " << threshold << endl;
+  cout << "Threshold set to: " << threshold << '\n';
 ```
 As shown above, use `std::istream::str()` to get the param value as a `std:string` or just stream the value into a variable of a suitable type. Standard stream state indicates failure, including when the argument was not given.  
 When using multiple names, the first value found will be returned.
@@ -128,16 +128,17 @@ Positional arguments, flags *and* parameters are accessible as "ranges":
 ```cpp
 cout << "Positional args:\n";
 for (auto& pos_arg : cmdl.pos_args())
-  cout << '\t' << pos_arg << endl;
+  cout << '\t' << pos_arg << '\n';
 
 cout << "\nFlags:\n";
 for (auto& flag : cmdl.flags())
-  cout << '\t' << flag << endl;
+  cout << '\t' << flag << '\n';
 
 cout << "\nParameters:\n";
 for (auto& param : cmdl.params())
-  cout << '\t' << param.first << " : " << param.second << endl;
+  cout << '\t' << param.first << " : " << param.second << '\n';
 ```
+
 
 By default, options are assumed to be boolean flags. 
 When this is not what you want, there are several ways to specify when an option is a parameter with an associated value.  
@@ -147,14 +148,14 @@ Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <n
 using namespace argh;
 auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-std::cout << cmdl("--threshold").str() << std::endl;
+cout << cmdl("--threshold").str() << '\n';
 ```
 Pre-register an expected parameter name:
 ```cpp
 argh::parser cmdl;
 cmdl.add_param("threshold"); // pre-register "threshold" as a param: name + value
 cmdl.parse(argc, argv);
-std::cout << cmdl("threshold").str() << std::endl;
+cout << cmdl("threshold").str() << '\n';
 ```
 Use a `=` (with no spaces around it) within the option when *calling* the app:
 ```cpp
@@ -234,7 +235,7 @@ e.g
 
 ```cpp
 if (!(cmdl("scale") >> scale_factor))
-  cerr << "Must provide valid scale factor!" << endl;
+  cerr << "Must provide valid scale factor!" << '\n';
 ```
 
 Use the `.str()` method to get the parameter value as a string: e.g. `cmdl("name").str();`
