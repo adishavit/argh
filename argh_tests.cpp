@@ -628,3 +628,33 @@ TEST_CASE("Test positional access via range for")
       CHECK(arg == std::to_string(i++));
    }
 }
+
+TEST_CASE("Test initializer list ctor for preregistered params")
+{
+   const char* argv[] = { "-a","1","-b","2", nullptr };
+
+   parser cmdl({ "a", "b" });
+   cmdl.parse(argv);
+
+   CHECK(!cmdl[{"a"}]); // a and b are params. not flags
+   CHECK(!cmdl[{"b"}]);
+   CHECK(!cmdl[{"c"}]);
+
+   CHECK(cmdl({ "a" }));
+   CHECK(cmdl({ "b" }));
+   CHECK(!cmdl({ "c" }));
+
+   CHECK(cmdl({ "a", "x", "y" }).str() == "1");
+   CHECK(cmdl({ "b", "x", "y" }).str() == "2");
+   CHECK(cmdl({ "x", "a", "y" }).str() == "1");
+   CHECK(cmdl({ "y", "x", "b" }).str() == "2");
+
+   // gets first value
+   CHECK(cmdl({ "a", "b" }).str() == "1");
+   CHECK(cmdl({ "b", "a" }).str() == "2");
+
+   // handles empty strings
+   CHECK(!cmdl({ "" }));
+   CHECK(cmdl({ "", "a" }));
+   CHECK(cmdl({ "a", "" }));
+}

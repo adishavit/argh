@@ -150,7 +150,7 @@ auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 cout << cmdl("--threshold").str() << '\n';
 ```
-Pre-register an expected parameter name with `add_param()`:
+Pre-register an expected parameter name with `add_param()` (before calling `parse()`):
 ```cpp
 argh::parser cmdl;
 cmdl.add_param("threshold"); // pre-register "threshold" as a param: name + value
@@ -160,11 +160,16 @@ cout << cmdl("threshold").str() << '\n';
 You can also *batch* pre-register multiple options as parameters with `add_params({ ... })`:
 ```cpp
 argh::parser cmdl;
-cmdl.add_params({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register muliple params: name + value
+cmdl.add_params({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register multiple params: name + value
 cmdl.parse(argc, argv);
 cout << cmdl("threshold").str() << '\n';
 ```
-
+Since pre-registration has to be done *before* parsing, we might as well just use the ctor:
+```cpp
+argh::parser cmdl({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register multiple params: name + value
+cmdl.parse(argc, argv);
+cout << cmdl("threshold").str() << '\n';
+```
 Use a `=` (with no spaces around it) within the option when *calling* the app:
 ```cpp
 >> my_app --threshold=42

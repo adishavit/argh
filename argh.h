@@ -78,6 +78,10 @@ namespace argh
                 };
 
       parser() = default;
+
+      parser(std::initializer_list<char const* const> pre_reg_names)
+      {  add_params(pre_reg_names); }
+
       parser(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION)
       {  parse(argv, mode); }
 
@@ -155,7 +159,6 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-
    inline void parser::parse(const char * const argv[], int mode)
    {
       int argc = 0;
@@ -163,9 +166,7 @@ namespace argh
       parse(argc, argv, mode);
    }
 
-
    //////////////////////////////////////////////////////////////////////////
-
 
    void parser::parse(int argc, const char* const argv[], int mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
    {
@@ -274,12 +275,10 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-
    bool argh::parser::got_flag(std::string const& name)
    {
       return flags_.end() != flags_.find(trim_leading_dashes(name));
    }
-
 
    //////////////////////////////////////////////////////////////////////////
 
@@ -358,7 +357,6 @@ namespace argh
       return string_stream(ostr.str()); // use default
    }
 
-
    //////////////////////////////////////////////////////////////////////////
 
    string_stream parser::operator()(size_t ind)
@@ -398,7 +396,6 @@ namespace argh
       for (auto& name : init_list)
          registeredParams_.insert(trim_leading_dashes(name));
    }
-
 }
 
 
