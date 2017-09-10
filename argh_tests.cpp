@@ -526,6 +526,94 @@ TEST_CASE("Test initializer list for params with default values")
    CHECK(cmdl({ "" }, 1).str() == "1");
 }
 
+TEST_CASE("Test initializer list for unregistered params with PREFER_PARAM_FOR_UNREG_OPTION")
+{
+   const char* argv[] = { "-a","1","-b","2", nullptr };
+   parser cmdl(argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
+
+   CHECK(!cmdl[{"a"}]); // a and b are params. not flags
+   CHECK(!cmdl[{"b"}]);
+   CHECK(!cmdl[{"c"}]);
+
+   CHECK(cmdl({ "a" }));
+   CHECK(cmdl({ "b" }));
+   CHECK(!cmdl({ "c" }));
+
+   CHECK(cmdl({ "a", "x", "y" }).str() == "1");
+   CHECK(cmdl({ "b", "x", "y" }).str() == "2");
+   CHECK(cmdl({ "x", "a", "y" }).str() == "1");
+   CHECK(cmdl({ "y", "x", "b" }).str() == "2");
+
+   // gets first value
+   CHECK(cmdl({ "a", "b" }).str() == "1");
+   CHECK(cmdl({ "b", "a" }).str() == "2");
+
+   // handles empty strings
+   CHECK(!cmdl({ "" }));
+   CHECK(cmdl({ "", "a" }));
+   CHECK(cmdl({ "a", "" }));
+}
+
+TEST_CASE("Test initializer list for preregistered params")
+{
+   const char* argv[] = { "-a","1","-b","2", nullptr };
+   parser cmdl;
+   cmdl.add_param("a");
+   cmdl.add_param("b");
+   cmdl.parse(argv);
+
+   CHECK(!cmdl[{"a"}]); // a and b are params. not flags
+   CHECK(!cmdl[{"b"}]);
+   CHECK(!cmdl[{"c"}]);
+
+   CHECK(cmdl({ "a" }));
+   CHECK(cmdl({ "b" }));
+   CHECK(!cmdl({ "c" }));
+
+   CHECK(cmdl({ "a", "x", "y" }).str() == "1");
+   CHECK(cmdl({ "b", "x", "y" }).str() == "2");
+   CHECK(cmdl({ "x", "a", "y" }).str() == "1");
+   CHECK(cmdl({ "y", "x", "b" }).str() == "2");
+
+   // gets first value
+   CHECK(cmdl({ "a", "b" }).str() == "1");
+   CHECK(cmdl({ "b", "a" }).str() == "2");
+
+   // handles empty strings
+   CHECK(!cmdl({ "" }));
+   CHECK(cmdl({ "", "a" }));
+   CHECK(cmdl({ "a", "" }));
+}
+
+TEST_CASE("Test initializer list add_params() for preregistered params")
+{
+   const char* argv[] = { "-a","1","-b","2", nullptr };
+   parser cmdl;
+   cmdl.add_params({ "a", "b" });
+   cmdl.parse(argv);
+
+   CHECK(!cmdl[{"a"}]); // a and b are params. not flags
+   CHECK(!cmdl[{"b"}]);
+   CHECK(!cmdl[{"c"}]);
+
+   CHECK(cmdl({ "a" }));
+   CHECK(cmdl({ "b" }));
+   CHECK(!cmdl({ "c" }));
+
+   CHECK(cmdl({ "a", "x", "y" }).str() == "1");
+   CHECK(cmdl({ "b", "x", "y" }).str() == "2");
+   CHECK(cmdl({ "x", "a", "y" }).str() == "1");
+   CHECK(cmdl({ "y", "x", "b" }).str() == "2");
+
+   // gets first value
+   CHECK(cmdl({ "a", "b" }).str() == "1");
+   CHECK(cmdl({ "b", "a" }).str() == "2");
+
+   // handles empty strings
+   CHECK(!cmdl({ "" }));
+   CHECK(cmdl({ "", "a" }));
+   CHECK(cmdl({ "a", "" }));
+}
 
 TEST_CASE("Test positional access via range for")
 {

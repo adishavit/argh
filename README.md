@@ -150,13 +150,21 @@ auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 cout << cmdl("--threshold").str() << '\n';
 ```
-Pre-register an expected parameter name:
+Pre-register an expected parameter name with `add_param()`:
 ```cpp
 argh::parser cmdl;
 cmdl.add_param("threshold"); // pre-register "threshold" as a param: name + value
 cmdl.parse(argc, argv);
 cout << cmdl("threshold").str() << '\n';
 ```
+You can also *batch* pre-register multiple options as parameters with `add_params({ ... })`:
+```cpp
+argh::parser cmdl;
+cmdl.add_params({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register muliple params: name + value
+cmdl.parse(argc, argv);
+cout << cmdl("threshold").str() << '\n';
+```
+
 Use a `=` (with no spaces around it) within the option when *calling* the app:
 ```cpp
 >> my_app --threshold=42

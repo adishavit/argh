@@ -85,6 +85,7 @@ namespace argh
       {  parse(argc, argv, mode); }
 
       void add_param(std::string const& name);
+      void add_params(std::initializer_list<char const* const> init_list);
 
       void parse(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
       void parse(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
@@ -95,7 +96,7 @@ namespace argh
 
       // begin() and end() for using range-for over positional args.
       std::vector<std::string>::const_iterator begin() { return pos_args_.cbegin(); }
-      std::vector<std::string>::const_iterator end()   { return pos_args_.cend();    }
+      std::vector<std::string>::const_iterator end()   { return pos_args_.cend();   }
 
       //////////////////////////////////////////////////////////////////////////
       // Accessors
@@ -389,6 +390,15 @@ namespace argh
    {
       registeredParams_.insert(trim_leading_dashes(name));
    }
+
+   //////////////////////////////////////////////////////////////////////////
+
+   void parser::add_params(std::initializer_list<char const* const> init_list)
+   {
+      for (auto& name : init_list)
+         registeredParams_.insert(trim_leading_dashes(name));
+   }
+
 }
 
 
