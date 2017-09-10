@@ -254,8 +254,8 @@ if (!(cmdl("scale") >> scale_factor))
 Use the `.str()` method to get the parameter value as a string: e.g. `cmdl("name").str();`
 
 ### More Methods
-- Use `parser::add_param()` to *optionally* pre-register a parameter name when in `PREFER_FLAG_FOR_UNREG_OPTION` mode.
-- Use `parser::pos_args()`, `parser::flags()` and `parser::params()` to access and iterate over the Arg containers directly.
+- Use `parser::add_param()`, `parser::add_params()` or the `parser({...})` constructor to *optionally* pre-register a parameter name when in `PREFER_FLAG_FOR_UNREG_OPTION` mode.
+- Use `parser`, `parser::pos_args()`, `parser::flags()` and `parser::params()` to access and iterate over the Arg containers directly.
 
 ## Colophon
 I ❤ your feedback. If you found Argh! useful - do Tweet about it to let [me](https://twitter.com/AdiShavit) know. If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).
