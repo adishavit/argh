@@ -94,58 +94,58 @@ namespace argh
       void parse(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
       void parse(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
-      std::multiset<std::string>          const& flags()    const { return flags_; }
-      std::map<std::string, std::string>  const& params()   const { return params_; }
+      std::multiset<std::string>          const& flags()    const { return flags_;    }
+      std::map<std::string, std::string>  const& params()   const { return params_;   }
       std::vector<std::string>            const& pos_args() const { return pos_args_; }
 
       // begin() and end() for using range-for over positional args.
-      std::vector<std::string>::const_iterator begin() { return pos_args_.cbegin(); }
-      std::vector<std::string>::const_iterator end()   { return pos_args_.cend();   }
+      std::vector<std::string>::const_iterator begin() const { return pos_args_.cbegin(); }
+      std::vector<std::string>::const_iterator end()   const { return pos_args_.cend();   }
 
       //////////////////////////////////////////////////////////////////////////
       // Accessors
 
       // flag (boolean) accessors: return true if the flag appeared, otherwise false.
-      bool operator[](std::string const& name);
+      bool operator[](std::string const& name) const;
 
       // multiple flag (boolean) accessors: return true if at least one of the flag appeared, otherwise false.
-      bool operator[](std::initializer_list<char const* const> init_list);
+      bool operator[](std::initializer_list<char const* const> init_list) const;
 
       // returns positional arg string by order. Like argv[] but without the options
-      std::string const& operator[](size_t ind);
+      std::string const& operator[](size_t ind) const;
 
       // returns a std::istream that can be used to convert a positional arg to a typed value.
-      string_stream operator()(size_t ind);
+      string_stream operator()(size_t ind) const;
 
       // same as above, but with a default value in case the arg is missing (index out of range).
       template<typename T>
-      string_stream operator()(size_t ind, T&& def_val);
+      string_stream operator()(size_t ind, T&& def_val) const;
 
       // parameter accessors, give a name get an std::istream that can be used to convert to a typed value.
       // call .str() on result to get as string
-      string_stream operator()(std::string const& name);
+      string_stream operator()(std::string const& name) const;
 
       // accessor for a parameter with multiple names, give a list of names, get an std::istream that can be used to convert to a typed value.
       // call .str() on result to get as string
       // returns the first value in the list to be found.
-      string_stream operator()(std::initializer_list<char const* const> init_list);
+      string_stream operator()(std::initializer_list<char const* const> init_list) const;
 
       // same as above, but with a default value in case the param was missing.
       // Non-string def_val types must have an operator<<() (output stream operator)
       // If T only has an input stream operator, pass the string version of the type as in "3" instead of 3.
       template<typename T>
-      string_stream operator()(std::string const& name, T&& def_val);
+      string_stream operator()(std::string const& name, T&& def_val) const;
 
       // same as above but for a list of names. returns the first value to be found.
       template<typename T>
-      string_stream operator()(std::initializer_list<char const* const> init_list, T&& def_val);
+      string_stream operator()(std::initializer_list<char const* const> init_list, T&& def_val) const;
 
    private:
       string_stream bad_stream() const;
-      std::string trim_leading_dashes(std::string const& name);
-      bool is_number(std::string const& arg);
-      bool is_option(std::string const& arg);
-      bool got_flag(std::string const& name);
+      std::string trim_leading_dashes(std::string const& name) const;
+      bool is_number(std::string const& arg) const;
+      bool is_option(std::string const& arg) const;
+      bool got_flag(std::string const& name) const;
 
    private:
       std::vector<std::string> args_;
@@ -246,7 +246,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::is_number(std::string const& arg)
+   bool parser::is_number(std::string const& arg) const
    {
       // inefficient but simple way to determine if a string is a number (which can start with a '-')
       std::istringstream istr(arg);
@@ -257,7 +257,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::is_option(std::string const& arg)
+   bool parser::is_option(std::string const& arg) const
    {
       assert(0 != arg.size());
       if (is_number(arg))
@@ -267,7 +267,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   std::string parser::trim_leading_dashes(std::string const& name)
+   std::string parser::trim_leading_dashes(std::string const& name) const
    {
       auto pos = name.find_first_not_of('-');
       return std::string::npos != pos ? name.substr(pos) : name;
@@ -275,28 +275,28 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool argh::parser::got_flag(std::string const& name)
+   bool argh::parser::got_flag(std::string const& name) const
    {
       return flags_.end() != flags_.find(trim_leading_dashes(name));
    }
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::operator[](std::string const& name)
+   bool parser::operator[](std::string const& name) const
    {
       return got_flag(name);
    }
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::operator[](std::initializer_list<char const* const> init_list)
+   bool parser::operator[](std::initializer_list<char const* const> init_list) const
    {
       return std::any_of(init_list.begin(), init_list.end(), [&](char const* const name) { return got_flag(name); });
    }
 
    //////////////////////////////////////////////////////////////////////////
 
-   std::string const& parser::operator[](size_t ind)
+   std::string const& parser::operator[](size_t ind) const
    {
       if (ind < pos_args_.size())
          return pos_args_[ind];
@@ -305,7 +305,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   string_stream parser::operator()(std::string const& name)
+   string_stream parser::operator()(std::string const& name) const
    {
       auto optIt = params_.find(trim_leading_dashes(name));
       if (params_.end() != optIt)
@@ -315,7 +315,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   string_stream parser::operator()(std::initializer_list<char const* const> init_list)
+   string_stream parser::operator()(std::initializer_list<char const* const> init_list) const
    {
       for (auto& name : init_list)
       {
@@ -329,7 +329,7 @@ namespace argh
    //////////////////////////////////////////////////////////////////////////
 
    template<typename T>
-   string_stream parser::operator()(std::string const& name, T&& def_val)
+   string_stream parser::operator()(std::string const& name, T&& def_val) const
    {
       auto optIt = params_.find(trim_leading_dashes(name));
       if (params_.end() != optIt)
@@ -344,7 +344,7 @@ namespace argh
 
    // same as above but for a list of names. returns the first value to be found.
    template<typename T>
-   string_stream parser::operator()(std::initializer_list<char const* const> init_list, T&& def_val)
+   string_stream parser::operator()(std::initializer_list<char const* const> init_list, T&& def_val) const
    {
       for (auto& name : init_list)
       {
@@ -359,7 +359,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   string_stream parser::operator()(size_t ind)
+   string_stream parser::operator()(size_t ind) const
    {
       if (pos_args_.size() <= ind)
          return bad_stream();
@@ -370,7 +370,7 @@ namespace argh
    //////////////////////////////////////////////////////////////////////////
 
    template<typename T>
-   string_stream parser::operator()(size_t ind, T&& def_val)
+   string_stream parser::operator()(size_t ind, T&& def_val) const
    {
       if (pos_args_.size() <= ind)
       {

@@ -658,3 +658,38 @@ TEST_CASE("Test initializer list ctor for preregistered params")
    CHECK(cmdl({ "", "a" }));
    CHECK(cmdl({ "a", "" }));
 }
+
+TEST_CASE("Test const correctness")
+{
+   const char* argv[] = { "42", "-a=1","-x", nullptr };
+   const parser cmdl(argv);
+
+   CHECK("42" == cmdl[0]);
+   CHECK("42" == cmdl(0).str());
+
+   CHECK(!cmdl["a"]);
+   CHECK(!cmdl[{"a"}]);
+   CHECK(cmdl["x"]);
+   CHECK(cmdl[{"x"}]);
+
+   [](argh::parser const& cmdl)
+   {
+      CHECK(1 == cmdl.pos_args().size());
+
+      for (auto arg : cmdl)
+         CHECK(std::to_string(42) == arg);
+
+      for (auto arg : cmdl.pos_args())
+         CHECK(std::to_string(42) == arg);
+
+      for (auto arg : cmdl.flags())
+         CHECK("x" == arg);
+
+      for (auto arg : cmdl.params())
+      {
+         CHECK("a" == arg.first);
+         CHECK("1" == arg.second);
+      }
+
+   }(cmdl);
+}
