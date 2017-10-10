@@ -44,9 +44,9 @@ The API is:
  - No non-`std` dependencies. 
 
 `argh` does not care about:
- - How many `-` preceded your option;
+ - How many '`-`' preceded your option;
  - Which flags and options you support - that is your responsibility;
- - Syntax validation: *any* command line is a valid combination of positional *parameters*, *flags* and *options*;
+ - Syntax validation: *any* command line is a valid (*not necessarily unique*) combination of positional *parameters*, *flags* and *options*;
  - Automatically producing a usage message.
 
 ## Tutorial
