@@ -168,7 +168,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   void parser::parse(int argc, const char* const argv[], int mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
+   inline void parser::parse(int argc, const char* const argv[], int mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
    {
       // convert to strings
       args_.resize(argc);
@@ -237,7 +237,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   string_stream parser::bad_stream() const
+   inline string_stream parser::bad_stream() const
    {
       string_stream bad;
       bad.setstate(std::ios_base::failbit);
@@ -246,7 +246,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::is_number(std::string const& arg) const
+   inline bool parser::is_number(std::string const& arg) const
    {
       // inefficient but simple way to determine if a string is a number (which can start with a '-')
       std::istringstream istr(arg);
@@ -257,7 +257,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::is_option(std::string const& arg) const
+   inline bool parser::is_option(std::string const& arg) const
    {
       assert(0 != arg.size());
       if (is_number(arg))
@@ -267,7 +267,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   std::string parser::trim_leading_dashes(std::string const& name) const
+   inline std::string parser::trim_leading_dashes(std::string const& name) const
    {
       auto pos = name.find_first_not_of('-');
       return std::string::npos != pos ? name.substr(pos) : name;
@@ -275,28 +275,28 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool argh::parser::got_flag(std::string const& name) const
+   inline bool argh::parser::got_flag(std::string const& name) const
    {
       return flags_.end() != flags_.find(trim_leading_dashes(name));
    }
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::operator[](std::string const& name) const
+   inline bool parser::operator[](std::string const& name) const
    {
       return got_flag(name);
    }
 
    //////////////////////////////////////////////////////////////////////////
 
-   bool parser::operator[](std::initializer_list<char const* const> init_list) const
+   inline bool parser::operator[](std::initializer_list<char const* const> init_list) const
    {
       return std::any_of(init_list.begin(), init_list.end(), [&](char const* const name) { return got_flag(name); });
    }
 
    //////////////////////////////////////////////////////////////////////////
 
-   std::string const& parser::operator[](size_t ind) const
+   inline std::string const& parser::operator[](size_t ind) const
    {
       if (ind < pos_args_.size())
          return pos_args_[ind];
@@ -305,7 +305,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   string_stream parser::operator()(std::string const& name) const
+   inline string_stream parser::operator()(std::string const& name) const
    {
       auto optIt = params_.find(trim_leading_dashes(name));
       if (params_.end() != optIt)
@@ -315,7 +315,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   string_stream parser::operator()(std::initializer_list<char const* const> init_list) const
+   inline string_stream parser::operator()(std::initializer_list<char const* const> init_list) const
    {
       for (auto& name : init_list)
       {
@@ -359,7 +359,7 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   string_stream parser::operator()(size_t ind) const
+   inline string_stream parser::operator()(size_t ind) const
    {
       if (pos_args_.size() <= ind)
          return bad_stream();
@@ -384,14 +384,14 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
-   void parser::add_param(std::string const& name)
+   inline void parser::add_param(std::string const& name)
    {
       registeredParams_.insert(trim_leading_dashes(name));
    }
 
    //////////////////////////////////////////////////////////////////////////
 
-   void parser::add_params(std::initializer_list<char const* const> init_list)
+   inline void parser::add_params(std::initializer_list<char const* const> init_list)
    {
       for (auto& name : init_list)
          registeredParams_.insert(trim_leading_dashes(name));
