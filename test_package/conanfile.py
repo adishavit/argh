@@ -16,4 +16,4 @@ class TestPackageConan(ConanFile):
 
     def test(self):
         with tools.environment_append(RunEnvironment(self).vars):
-            self.run(os.path.join("bin", "test_package"))
+            self.run("%s -v" % os.path.join("bin", "test_package"))
