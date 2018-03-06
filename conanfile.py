@@ -4,12 +4,12 @@ import os
 
 class ArghConan(ConanFile):
     name = "argh"
-    version = "1.2.0"
+    version = "1.2.1"
     url = "https://github.com/adishavit/argh"
     description = "Argh! A minimalist argument handler."
     license = "BSD 3-Clause"
     exports = ["LICENSE"]
-    exports_sources = "*.h"
+    exports_sources = "argh.h"
 
     def package(self):
         self.copy(pattern="LICENSE", dst="license")
