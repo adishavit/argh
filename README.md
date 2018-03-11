@@ -1,5 +1,5 @@
-# *Argh!*
-<img src="assets/argh_logo.png" style="float:right;width:200px;">
+![logo](assets/argh_logo_small.png)
+
 > *Frustration-free command line processing*
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
