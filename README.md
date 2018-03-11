@@ -124,6 +124,8 @@ cout << "Positional args:\n";
 for (auto& pos_arg : cmdl)
   cout << '\t' << pos_arg << '\n';
 ```
+Similarly, `cmdl.size()` will return the count of *positional* arguments. 
+
 Positional arguments, flags *and* parameters are accessible as "ranges":
 ```cpp
 cout << "Positional args:\n";

@@ -101,6 +101,7 @@ namespace argh
       // begin() and end() for using range-for over positional args.
       std::vector<std::string>::const_iterator begin() const { return pos_args_.cbegin(); }
       std::vector<std::string>::const_iterator end()   const { return pos_args_.cend();   }
+      size_t size()                                    const { return pos_args_.size();   }
 
       //////////////////////////////////////////////////////////////////////////
       // Accessors

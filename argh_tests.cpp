@@ -10,6 +10,7 @@ TEST_CASE("Test empty cmdl")
     parser cmdl;
     cmdl.parse(0, nullptr);
     CHECK(0 == cmdl.pos_args().size());
+    CHECK(0 == cmdl.size());
     CHECK(cmdl[0].empty());
     CHECK(cmdl(0).str().empty());
     CHECK(cmdl[10].empty());
@@ -26,6 +27,7 @@ TEST_CASE("Test parsing ctor")
       parser cmdl(argc, argv);
       CHECK(2 == cmdl.flags().size());
       CHECK(5 == cmdl.pos_args().size());
+      CHECK(5 == cmdl.size());
       CHECK(cmdl["a"]);
       CHECK(cmdl["b"]);
       CHECK(!cmdl["c"]);
@@ -33,7 +35,7 @@ TEST_CASE("Test parsing ctor")
    {
       auto cmdl = parser(argc, argv);
       CHECK(2 == cmdl.flags().size());
-      CHECK(5 == cmdl.pos_args().size());
+      CHECK(5 == cmdl.size());
       CHECK(cmdl["a"]);
       CHECK(cmdl["b"]);
       CHECK(!cmdl["c"]);
@@ -675,6 +677,7 @@ TEST_CASE("Test const correctness")
    [](argh::parser const& cmdl)
    {
       CHECK(1 == cmdl.pos_args().size());
+      CHECK(1 == cmdl.size());
 
       for (auto arg : cmdl)
          CHECK(std::to_string(42) == arg);
@@ -692,4 +695,32 @@ TEST_CASE("Test const correctness")
       }
 
    }(cmdl);
+}
+
+TEST_CASE("Test size() member function")
+{
+   {
+      parser cmdl;
+      cmdl.parse(0, nullptr);
+      CHECK(0 == cmdl.pos_args().size());
+      CHECK(cmdl.pos_args().size() == cmdl.size());
+   }
+
+   {
+      const char* argv[] = { "-a", "--b=2", "-c"};
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      parser cmdl(argc, argv);
+      CHECK(0 == cmdl.pos_args().size());
+      CHECK(cmdl.pos_args().size() == cmdl.size());
+   }
+
+   {
+      const char* argv[] = { "a", "-a", "b", "-b", "c", "-c" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      parser cmdl(argc, argv);
+      CHECK(cmdl.pos_args().size() == cmdl.size());
+      CHECK(3 == cmdl.flags().size());
+      CHECK(3 == cmdl.size());
+      CHECK(cmdl.flags().size() == cmdl.size());
+   }
 }

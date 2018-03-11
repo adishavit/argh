@@ -12,6 +12,10 @@ int main(int argc, char* argv[])
     if (cmdl["-v"])
         cout << "Verbose, I am." << endl;
 
+	 cout << "Positional args:\n";
+	 for (auto& pos_arg : cmdl)
+		 cout << '\t' << pos_arg << endl;
+
     cout << "Positional args:\n";
     for (auto& pos_arg : cmdl.pos_args())
         cout << '\t' << pos_arg << endl;
