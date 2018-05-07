@@ -97,7 +97,7 @@ else if (cmdl(11))
 ```
 But we can also set default values for positional arguments. These are passed as the second argument:
 ```cpp
-float scale_facor;
+float scale_factor;
 cmdl(2, 1.0f) >> scale_factor;
      ^^^^^^^
 ```
@@ -106,12 +106,12 @@ If the position argument was not given or the streaming conversion failed, the d
 Similarly, parameters can be accessed by name(s) (i.e. by string or list of string literals) with:  
 `(<std::string> [, <default value>])` or   `({ "<name-1>", "<name-2>", ... } [, <default value>])`:  
 ```cpp
-float scale_facor;
+float scale_factor;
 cmdl("scale", 1.0f) >> scale_factor; // Use 1.0f as default value
      ^^^^^^^^^^^^^
 
 float threshold;
-if (!(cmdl({ "-t", "--threshold"}) >> theshold)) // Check for missing param and/or bad (inconvertible) param value
+if (!(cmdl({ "-t", "--threshold"}) >> threshold)) // Check for missing param and/or bad (inconvertible) param value
   cerr << "Must provide a valid threshold value! Got '" << cmdl("threshold").str() << "'" << endl;
 else                                                                        ^^^^^^
   cout << "Threshold set to: " << threshold << '\n';
