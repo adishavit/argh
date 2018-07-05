@@ -337,20 +337,27 @@ TEST_CASE("Interpret single-dash arg as multi-flag")
         CHECK(!cmdl["c"]);
     }
     {
-        parser cmdl;
-        cmdl.add_param("f");
-        cmdl.parse(argc, argv, parser::PREFER_FLAG_FOR_UNREG_OPTION | parser::SINGLE_DASH_IS_MULTIFLAG);
+        int modes[] = { 
+            parser::SINGLE_DASH_IS_MULTIFLAG, // flags preferred by default
+            parser::PREFER_FLAG_FOR_UNREG_OPTION | parser::SINGLE_DASH_IS_MULTIFLAG,
+        };
+        for (int mode : modes)
+        {
+            parser cmdl;
+            cmdl.add_param("f");
+            cmdl.parse(argc, argv, mode);
 
-        CHECK(cmdl["x"]);
-        CHECK(cmdl["v"]);
-        CHECK(cmdl("f").str() == "42");
+            CHECK(cmdl["x"]);
+            CHECK(cmdl["v"]);
+            CHECK(cmdl("f").str() == "42");
 
-        CHECK(cmdl["abc"]);
-        CHECK(cmdl.pos_args().size() == 1);
-        CHECK(cmdl.pos_args().at(0) == "54");
-        CHECK(!cmdl["a"]);
-        CHECK(!cmdl["b"]);
-        CHECK(!cmdl["c"]);
+            CHECK(cmdl["abc"]);
+            CHECK(cmdl.pos_args().size() == 1);
+            CHECK(cmdl.pos_args().at(0) == "54");
+            CHECK(!cmdl["a"]);
+            CHECK(!cmdl["b"]);
+            CHECK(!cmdl["c"]);
+        }
     }
     {
         parser cmdl;

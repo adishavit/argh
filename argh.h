@@ -244,16 +244,18 @@ namespace argh
          assert(!(mode & argh::parser::PREFER_FLAG_FOR_UNREG_OPTION)
              || !(mode & argh::parser::PREFER_PARAM_FOR_UNREG_OPTION));
 
-         if (is_param(name) ||
-            argh::parser::PREFER_PARAM_FOR_UNREG_OPTION & mode)
+         bool preferParam = mode & argh::parser::PREFER_PARAM_FOR_UNREG_OPTION;
+
+         if (is_param(name) || preferParam)
          {
             params_.insert({ name, args_[i + 1] });
             ++i; // skip next value, it is not a free parameter
             continue;
          }
-
-         if (argh::parser::PREFER_FLAG_FOR_UNREG_OPTION & mode)
+         else
+         {
             flags_.emplace(name);
+         }
       };
    }
 
