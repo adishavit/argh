@@ -219,6 +219,10 @@ namespace argh
             {
                name = keep_param;
             }
+            else
+            {
+               continue; // do not consider other options for this arg
+            }
          }
 
          // any potential option will get as its value the next arg, unless that arg is an option too
