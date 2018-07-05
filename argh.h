@@ -237,6 +237,9 @@ namespace argh
          // PREFER_PARAM_FOR_UNREG_OPTION: a non-registered 'name' is determined a parameter, the next arg
          //                                will be the value of that option.
 
+         assert(!(mode & argh::parser::PREFER_FLAG_FOR_UNREG_OPTION)
+             || !(mode & argh::parser::PREFER_PARAM_FOR_UNREG_OPTION));
+
          if (is_param(name) ||
             argh::parser::PREFER_PARAM_FOR_UNREG_OPTION & mode)
          {
