@@ -341,12 +341,11 @@ TEST_CASE("Interpret single-dash arg as multi-flag")
 
         CHECK(cmdl["x"]);
         CHECK(cmdl["v"]);
-        CHECK(cmdl["f"]);
+        CHECK(cmdl("f").str() == "42");
 
         CHECK(cmdl["abc"]);
-        CHECK(cmdl.pos_args().size() == 2);
-        CHECK(cmdl.pos_args().at(0) == "42");
-        CHECK(cmdl.pos_args().at(1) == "54");
+        CHECK(cmdl.pos_args().size() == 1);
+        CHECK(cmdl.pos_args().at(0) == "54");
         CHECK(!cmdl["a"]);
         CHECK(!cmdl["b"]);
         CHECK(!cmdl["c"]);
