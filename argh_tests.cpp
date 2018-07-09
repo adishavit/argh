@@ -339,7 +339,7 @@ TEST_CASE("Interpret single-dash arg as multi-flag")
     {
         int modes[] = { 
             parser::SINGLE_DASH_IS_MULTIFLAG, // flags preferred by default
-            parser::PREFER_FLAG_FOR_UNREG_OPTION | parser::SINGLE_DASH_IS_MULTIFLAG,
+            parser::PREFER_FLAG_FOR_UNREG_OPTION  | parser::SINGLE_DASH_IS_MULTIFLAG
         };
         for (int mode : modes)
         {
@@ -384,6 +384,20 @@ TEST_CASE("Interpret single-dash arg as multi-flag")
         CHECK(!cmdl["a"]);
         CHECK(!cmdl["b"]);
         CHECK(!cmdl["c"]);
+    }
+    {
+       parser cmdl;
+       cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION | parser::SINGLE_DASH_IS_MULTIFLAG);
+
+       CHECK(!cmdl("xvf"));
+       CHECK(cmdl["x"]);
+       CHECK(cmdl["v"]);
+       CHECK(cmdl["f"]); // ensure `f` does not default to PARAM unless explicitly registered.
+
+       CHECK(cmdl("abc"));
+       CHECK(!cmdl["a"]);
+       CHECK(!cmdl["b"]);
+       CHECK(!cmdl["c"]);
     }
 }
 

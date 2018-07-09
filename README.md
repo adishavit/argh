@@ -183,6 +183,7 @@ Use a `=` (with no spaces around it) within the option when *calling* the app:
 - By default, arguments of the form `--<name>=<value>` (with no spaces, one or more dashes), e.g. `--answer=42`, will be parsed as `<parameter-name> <parameter-value>`.
 To disable this specify the **`NO_SPLIT_ON_EQUALSIGN`** mode.
 - Specifying the **`SINGLE_DASH_IS_MULTIFLAG`** mode will split a single-hyphen argument into multiple single-character flags (as is common in various POSIX tools).
+- When using **`SINGLE_DASH_IS_MULTIFLAG`**, you can still pre-register the last character as a param with the value, such that if we pre-register `f` as a param, `>> myapp -xvf 42` will be parsed with two boolean flags `x` and `v` and a one param `f`=`42`.
 - When parsing parameter values as strings that may contain spaces (e.g. `--config="C:\Folder\With Space\Config.ini"`), prefer using `.str()` instead of `>>` to avoid the default automatic whitespace input stream tokenization:  
 `cout << cmdl({ "-c", "--config" }).str()`.
 
