@@ -147,6 +147,7 @@ namespace argh
       bool is_number(std::string const& arg) const;
       bool is_option(std::string const& arg) const;
       bool got_flag(std::string const& name) const;
+      bool is_param(std::string const& name) const;
 
    private:
       std::vector<std::string> args_;
@@ -197,13 +198,30 @@ namespace argh
          }
 
          // if the option is unregistered and should be a multi-flag
-         if (1 == (args_[i].size() - name.size()) &&                  // single dash
-            argh::parser::SINGLE_DASH_IS_MULTIFLAG & mode &&         // multi-flag mode
-            registeredParams_.find(name) == registeredParams_.end()) // unregistered
+         if (1 == (args_[i].size() - name.size()) &&         // single dash
+            argh::parser::SINGLE_DASH_IS_MULTIFLAG & mode && // multi-flag mode
+            !is_param(name))                                  // unregistered
          {
+            std::string keep_param; 
+            
+            if (!name.empty() && is_param(std::string(1ul, name.back()))) // last char is param
+            {
+               keep_param += name.back();
+               name.resize(name.size() - 1);
+            }
+
             for (auto const& c : name)
             {
                flags_.emplace(std::string{ c });
+            }
+
+            if (!keep_param.empty())
+            {
+               name = keep_param;
+            }
+            else
+            {
+               continue; // do not consider other options for this arg
             }
          }
 
@@ -223,16 +241,21 @@ namespace argh
          // PREFER_PARAM_FOR_UNREG_OPTION: a non-registered 'name' is determined a parameter, the next arg
          //                                will be the value of that option.
 
-         if (registeredParams_.find(name) != registeredParams_.end() ||
-            argh::parser::PREFER_PARAM_FOR_UNREG_OPTION & mode)
+         assert(!(mode & argh::parser::PREFER_FLAG_FOR_UNREG_OPTION)
+             || !(mode & argh::parser::PREFER_PARAM_FOR_UNREG_OPTION));
+
+         bool preferParam = mode & argh::parser::PREFER_PARAM_FOR_UNREG_OPTION;
+
+         if (is_param(name) || preferParam)
          {
             params_.insert({ name, args_[i + 1] });
             ++i; // skip next value, it is not a free parameter
             continue;
          }
-
-         if (argh::parser::PREFER_FLAG_FOR_UNREG_OPTION & mode)
+         else
+         {
             flags_.emplace(name);
+         }
       };
    }
 
@@ -279,6 +302,13 @@ namespace argh
    inline bool argh::parser::got_flag(std::string const& name) const
    {
       return flags_.end() != flags_.find(trim_leading_dashes(name));
+   }
+
+   //////////////////////////////////////////////////////////////////////////
+
+   inline bool argh::parser::is_param(std::string const& name) const
+   {
+      return registeredParams_.count(name);
    }
 
    //////////////////////////////////////////////////////////////////////////
