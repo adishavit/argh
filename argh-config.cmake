@@ -1,9 +1,10 @@
-#argh-config.cmake - package configuration file for argh library
+# argh-config.cmake - package configuration file for argh library
 #
 # exports:
+# 		argh - as INTERFACE library target with its INTERFACE_INCLUDE_DIRECTORIES set
 #
 # sets:
-#   argh_INCLUDE_DIR - the directory containing argh.h
+# 		argh_INCLUDE_DIR - the directory containing argh.h
 
 
 
