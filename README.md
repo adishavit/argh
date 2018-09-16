@@ -12,7 +12,7 @@ So many different command line processing libraries out there and none of them j
 Some bring their whole extended family of related and unrelated external dependencies (*yes, I'm looking at you Boost*).  
 Some require quirky syntax and/or very verbose setups that sacrifice simplicity for the generation of a cute usage message and validation. Many come to dominate your `main()` file and yet others do not build on multiple plaforms - for some even their own tests and trivial usage cause crashes on some systems. *Argh!*
 
-If you're writing a highly-sophisticated command line tool, then `Boost.Program_options` and its kin might give you many advanced options. However, if you need to get up and running quickly, effectively and with minimal fuss, give the single header-file `argh` a try.
+If you're writing a highly-sophisticated command line tool, then `Boost.Program_options` and its kind might give you many advanced options. However, if you need to get up and running quickly, effectively and with minimal fuss, give the single header-file `argh` a try.
 
 ## TL;DR
 It doesn't get much simpler than this:
@@ -28,30 +28,34 @@ int main(int, char* argv[])
 
     return EXIT_SUCCESS;
 }
-``` 
+```
 ## Philosophy
+
 Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
 
 The API is:
  - Minimalistic but expressive:
     - No getters nor binders
-    - Just the `[]` and `()` operators.
-    - Easy iteration (range-`for` too).
- - You don't pay for what you don't use;
- - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase;
- - No exceptions thrown for failures.
- - Liberal BSD license;
- - Single header file;
- - No non-`std` dependencies. 
+    - Just the `[]` and `()` operators
+    - Easy iteration (range-`for` too)
+ - You don't pay for what you don't use
+ - Conversion to typed variables happens (via `std::istream >>`) on the user side *after* the parsing phase
+ - No exceptions thrown for failures
+ - Liberal BSD license
+ - Single header file
+ - No non-`std` dependencies
 
-`argh` does not care about:
- - How many '`-`' preceded your option;
- - Which flags and options you support - that is your responsibility;
- - Syntax validation: *any* command line is a valid (*not necessarily unique*) combination of positional *parameters*, *flags* and *options*;
- - Automatically producing a usage message.
+`argh` does **not** care about:
+
+ - How many '`-`' preceded your option
+ - Which flags and options you support - that is your responsibility
+ - Syntax validation: *any* command line is a valid (*not necessarily unique*) combination of positional *parameters*, *flags* and *options*
+ - Automatically producing a usage message
 
 ## Tutorial
+
 Create parser:
+
 ```cpp
 auto cmdl = argh::parser(argc, argv);
 ```
@@ -260,8 +264,33 @@ if (!(cmdl("scale") >> scale_factor))
 Use the `.str()` method to get the parameter value as a string: e.g. `cmdl("name").str();`
 
 ### More Methods
+
 - Use `parser::add_param()`, `parser::add_params()` or the `parser({...})` constructor to *optionally* pre-register a parameter name when in `PREFER_FLAG_FOR_UNREG_OPTION` mode.
 - Use `parser`, `parser::pos_args()`, `parser::flags()` and `parser::params()` to access and iterate over the Arg containers directly.
 
+## Finding Argh!
+
+* copy `argh.h` somewhere into your projects directories
+* **or** include the repository as a *submodule*
+* **or** use *CMake*!
+
+#### Finding Argh! - CMake
+
+The provided `CMakeLists.txt` generates targets for tests, a demo application and an install target to install `argh` system-wide and make it known to CMake.  *You can control generation of* test *and* example *targets using the options `BUILD_TESTS` and `BUILD_EXAMPLES`. Only `argh` alongside its license and readme will be installed - not tests and demo!*
+
+
+Add `argh` to your CMake-project by using
+```cmake
+find_package(argh)
+```
+The package exports `argh` *INTERFACE* library target and `argh_INCLUDE_DIR` variable. Make `argh.h` known to your compiler by using one of the following methods; both will make the location of `argh.h` known to the compiler, not link in a precompiled library - even when using `target_link_libraries()`.
+```cmake
+target_include_directories(${MY_TARGET_NAME} PRIVATE "${argh_INCLUDE_DIR}")
+#OR
+target_link_libraries(${MY_TARGET_NAME} argh)
+
+```
+
 ## Colophon
+
 I ❤ your feedback. If you found Argh! useful - do Tweet about it to let [me](https://twitter.com/AdiShavit) know. If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).
