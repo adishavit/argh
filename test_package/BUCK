@@ -1,0 +1,9 @@
+cxx_binary(
+  name = 'test_package', 
+  srcs = [
+    'test_package.cpp', 
+  ], 
+  deps = [
+    '//:argh', 
+  ], 
+)

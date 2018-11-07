@@ -291,6 +291,25 @@ target_link_libraries(${MY_TARGET_NAME} argh)
 
 ```
 
+## Buck
+
+The [Buck](https://buckbuild.com/) build system is also supported. 
+
+Run the example: 
+
+```bash=
+buck run :example
+```
+
+Run the tests: 
+
+```bash=
+buck run :tests
+buck run test_package
+```
+
+If you take `argh` as a submodule, then the visible target is `argh`. 
+
 ## Colophon
 
 I ❤ your feedback. If you found Argh! useful - do Tweet about it to let [me](https://twitter.com/AdiShavit) know. If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).
