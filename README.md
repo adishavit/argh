@@ -308,7 +308,7 @@ buck run :tests
 buck run test_package
 ```
 
-If you take `argh` as a submodule, then the visible target is `argh`. 
+If you take `argh` as a submodule, then the visible target is `//:argh`. 
 
 ## Colophon
 
