@@ -29,7 +29,7 @@ endif()
 install(TARGETS argh EXPORT arghTargets)
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-# this might be a bit too restrictive, since for other (BSD, ...) this might applies also
+# this might be a bit too restrictive, since for other (BSD, ...) this might apply also
 # but this can be fixed later in extra pull requests from people on the platform
 	include(GNUInstallDirs)	
 	install(FILES "${CMAKE_CURRENT_LIST_DIR}/argh.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
