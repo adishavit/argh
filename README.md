@@ -17,6 +17,7 @@ If you're writing a highly-sophisticated command line tool, then `Boost.Program_
 ## TL;DR
 It doesn't get much simpler than this:
 ```cpp
+#include <iostream>
 #include "argh.h"
 
 int main(int, char* argv[])
