@@ -3,8 +3,16 @@ cmake_minimum_required(VERSION 3.1)
 
 set (CMAKE_CXX_STANDARD 11)
 
-option(BUILD_TESTS "Build tests. Uncheck for install only runs" ON)
-option(BUILD_EXAMPLES "Build examples. Uncheck for install only runs" ON)
+# Check if argh is being used directly or via add_subdirectory
+set(ARGH_MASTER_PROJECT OFF)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  set(ARGH_MASTER_PROJECT ON)
+endif()
+
+option(BUILD_TESTS "Build tests. Uncheck for install only runs"
+       ${ARGH_MASTER_PROJECT})
+option(BUILD_EXAMPLES "Build examples. Uncheck for install only runs"
+       ${ARGH_MASTER_PROJECT})
 
 if(BUILD_EXAMPLES)
 	add_executable(argh_example example.cpp)
