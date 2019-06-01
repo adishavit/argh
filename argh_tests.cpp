@@ -764,3 +764,37 @@ TEST_CASE("Test size() member function")
       CHECK(cmdl.flags().size() == cmdl.size());
    }
 }
+
+TEST_CASE("Test multiple parameters with the same name")
+{
+   {
+      std::set<std::string> values = {
+         "value1",
+         "value2",
+         "value3",
+         "value4",
+      };
+      const char* argv[] = { "--foo=value1", "--foo=value2", "--foo=value3", "--bar=value4" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      parser cmdl(argc, argv);
+
+      CHECK(4 == cmdl.params().size());
+      CHECK(1 == cmdl.params("bar").size());
+      CHECK(3 == cmdl.params("foo").size());
+
+      for (const auto& param : cmdl.params("foo")) {
+         auto found = values.find(param.second);
+         CHECK("foo" == param.first);
+         CHECK(found != values.end());
+         values.erase(param.second);
+      }
+
+      for (const auto& param : cmdl.params("bar")) {
+         CHECK("bar" == param.first);
+         CHECK("value4" == param.second);
+         values.erase(param.second);
+      }
+
+      CHECK(0 == values.size());
+   }
+}
