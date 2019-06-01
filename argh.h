@@ -68,6 +68,23 @@ namespace argh
    using string_stream = stringstream_proxy;
 #endif
 
+   class multimap_iteration_wrapper
+   {
+   public:
+      using iterator_t = std::multimap<std::string, std::string>::const_iterator;
+      explicit multimap_iteration_wrapper(const iterator_t& lb, const iterator_t& ub)
+         : lb_(lb)
+         , ub_(ub)
+      {}
+
+      iterator_t begin() const { return lb_; }
+      iterator_t end() const { return ub_; }
+
+   private:
+      iterator_t lb_;
+      iterator_t ub_;
+   };
+
    class parser
    {
    public:
@@ -94,9 +111,10 @@ namespace argh
       void parse(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
       void parse(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
-      std::multiset<std::string>          const& flags()    const { return flags_;    }
-      std::map<std::string, std::string>  const& params()   const { return params_;   }
-      std::vector<std::string>            const& pos_args() const { return pos_args_; }
+      std::multiset<std::string>               const& flags()    const { return flags_;    }
+      std::multimap<std::string, std::string>  const& params()   const { return params_;   }
+      multimap_iteration_wrapper                      params(std::string const& name) const;
+      std::vector<std::string>                 const& pos_args() const { return pos_args_; }
 
       // begin() and end() for using range-for over positional args.
       std::vector<std::string>::const_iterator begin() const { return pos_args_.cbegin(); }
@@ -151,7 +169,7 @@ namespace argh
 
    private:
       std::vector<std::string> args_;
-      std::map<std::string, std::string> params_;
+      std::multimap<std::string, std::string> params_;
       std::vector<std::string> pos_args_;
       std::multiset<std::string> flags_;
       std::set<std::string> registeredParams_;
@@ -426,6 +444,13 @@ namespace argh
    {
       for (auto& name : init_list)
          registeredParams_.insert(trim_leading_dashes(name));
+   }
+
+   //////////////////////////////////////////////////////////////////////////
+
+   inline multimap_iteration_wrapper parser::params(std::string const& name) const
+   {
+      return multimap_iteration_wrapper(params_.lower_bound(name), params_.upper_bound(name));
    }
 }
 
