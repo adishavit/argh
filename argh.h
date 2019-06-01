@@ -71,7 +71,9 @@ namespace argh
    class multimap_iteration_wrapper
    {
    public:
-      using iterator_t = std::multimap<std::string, std::string>::const_iterator;
+      using container_t = std::multimap<std::string, std::string>;
+      using iterator_t = container_t::const_iterator;
+      using difference_t = container_t::difference_type;
       explicit multimap_iteration_wrapper(const iterator_t& lb, const iterator_t& ub)
          : lb_(lb)
          , ub_(ub)
@@ -79,6 +81,7 @@ namespace argh
 
       iterator_t begin() const { return lb_; }
       iterator_t end() const { return ub_; }
+      difference_t size() const { return std::distance(lb_, ub_); }
 
    private:
       iterator_t lb_;
