@@ -1,7 +1,10 @@
 #pragma once
 
+#include <type_traits>
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
+#include <limits>
 #include <string>
 #include <vector>
 #include <set>
@@ -367,6 +370,9 @@ namespace argh
          return string_stream(optIt->second);
 
       std::ostringstream ostr;
+      using value_type = typename std::decay<T>::type;
+      if (std::is_floating_point<value_type>::value)
+          ostr << std::setprecision(std::numeric_limits<value_type>::max_digits10);
       ostr << def_val;
       return string_stream(ostr.str()); // use default
    }
@@ -382,8 +388,11 @@ namespace argh
          auto optIt = params_.find(trim_leading_dashes(name));
          if (params_.end() != optIt)
             return string_stream(optIt->second);
-      }      
+      }
       std::ostringstream ostr;
+      using value_type = typename std::decay<T>::type;
+      if (std::is_floating_point<value_type>::value)
+          ostr << std::setprecision(std::numeric_limits<value_type>::max_digits10);
       ostr << def_val;
       return string_stream(ostr.str()); // use default
    }
@@ -406,6 +415,9 @@ namespace argh
       if (pos_args_.size() <= ind)
       {
          std::ostringstream ostr;
+         using value_type = typename std::decay<T>::type;
+         if (std::is_floating_point<value_type>::value)
+             ostr << std::setprecision(std::numeric_limits<value_type>::max_digits10);
          ostr << def_val;
          return string_stream(ostr.str());
       }
