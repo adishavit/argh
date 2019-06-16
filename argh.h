@@ -3,7 +3,6 @@
 #include <type_traits>
 #include <algorithm>
 #include <sstream>
-#include <iomanip>
 #include <limits>
 #include <string>
 #include <vector>
@@ -60,7 +59,7 @@ namespace argh
 
       std::stringbuf* rdbuf() const { return stream_.rdbuf(); }
 
-      // Check the state of the stream. 
+      // Check the state of the stream.
       // False when the most recent stream operation failed
       operator bool() const { return !!stream_; }
 
@@ -205,8 +204,8 @@ namespace argh
             argh::parser::SINGLE_DASH_IS_MULTIFLAG & mode && // multi-flag mode
             !is_param(name))                                  // unregistered
          {
-            std::string keep_param; 
-            
+            std::string keep_param;
+
             if (!name.empty() && is_param(std::string(1ul, name.back()))) // last char is param
             {
                keep_param += name.back();
@@ -238,7 +237,7 @@ namespace argh
 
          // if 'name' is a pre-registered option, then the next arg cannot be a free parameter to it is skipped
          // otherwise we have 2 modes:
-         // PREFER_FLAG_FOR_UNREG_OPTION: a non-registered 'name' is determined a flag. 
+         // PREFER_FLAG_FOR_UNREG_OPTION: a non-registered 'name' is determined a flag.
          //                               The following value (the next arg) will be a free parameter.
          //
          // PREFER_PARAM_FOR_UNREG_OPTION: a non-registered 'name' is determined a parameter, the next arg
@@ -372,7 +371,7 @@ namespace argh
       std::ostringstream ostr;
       using value_type = typename std::decay<T>::type;
       if (std::is_floating_point<value_type>::value)
-          ostr << std::setprecision(std::numeric_limits<value_type>::max_digits10);
+          ostr.precision(std::numeric_limits<value_type>::max_digits10);
       ostr << def_val;
       return string_stream(ostr.str()); // use default
    }
@@ -392,7 +391,7 @@ namespace argh
       std::ostringstream ostr;
       using value_type = typename std::decay<T>::type;
       if (std::is_floating_point<value_type>::value)
-          ostr << std::setprecision(std::numeric_limits<value_type>::max_digits10);
+          ostr.precision(std::numeric_limits<value_type>::max_digits10);
       ostr << def_val;
       return string_stream(ostr.str()); // use default
    }
@@ -417,7 +416,7 @@ namespace argh
          std::ostringstream ostr;
          using value_type = typename std::decay<T>::type;
          if (std::is_floating_point<value_type>::value)
-             ostr << std::setprecision(std::numeric_limits<value_type>::max_digits10);
+             ostr.precision(std::numeric_limits<value_type>::max_digits10);
          ostr << def_val;
          return string_stream(ostr.str());
       }
@@ -440,5 +439,3 @@ namespace argh
          registeredParams_.insert(trim_leading_dashes(name));
    }
 }
-
-
