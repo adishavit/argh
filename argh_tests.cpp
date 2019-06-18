@@ -220,6 +220,19 @@ TEST_CASE("Test default value")
     val = -1;
     CHECK(!(cmdl("c", "bad-default") >> val));
     CHECK((-1 == val || 0 == val));
+
+    double pi     = 3.1415926535897932384626433832795028841971693993751058209749445;
+    double pi_val = 0;
+    CHECK((cmdl({"-pi, --archimedes-constant"}, pi) >> pi_val));
+    CHECK(pi == pi_val);
+
+    pi_val = 0;
+    CHECK((cmdl("-pi", pi) >> pi_val));
+    CHECK(pi == pi_val);
+
+    pi_val = 0;
+    CHECK((cmdl(argc + 1, pi) >> pi_val));
+    CHECK(pi == pi_val);
 }
 
 TEST_CASE("Leading dashed are stripped")

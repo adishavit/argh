@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <limits>
 #include <string>
 #include <vector>
 #include <set>
@@ -57,7 +58,7 @@ namespace argh
 
       std::stringbuf* rdbuf() const { return stream_.rdbuf(); }
 
-      // Check the state of the stream. 
+      // Check the state of the stream.
       // False when the most recent stream operation failed
       operator bool() const { return !!stream_; }
 
@@ -202,8 +203,8 @@ namespace argh
             argh::parser::SINGLE_DASH_IS_MULTIFLAG & mode && // multi-flag mode
             !is_param(name))                                  // unregistered
          {
-            std::string keep_param; 
-            
+            std::string keep_param;
+
             if (!name.empty() && is_param(std::string(1ul, name.back()))) // last char is param
             {
                keep_param += name.back();
@@ -235,7 +236,7 @@ namespace argh
 
          // if 'name' is a pre-registered option, then the next arg cannot be a free parameter to it is skipped
          // otherwise we have 2 modes:
-         // PREFER_FLAG_FOR_UNREG_OPTION: a non-registered 'name' is determined a flag. 
+         // PREFER_FLAG_FOR_UNREG_OPTION: a non-registered 'name' is determined a flag.
          //                               The following value (the next arg) will be a free parameter.
          //
          // PREFER_PARAM_FOR_UNREG_OPTION: a non-registered 'name' is determined a parameter, the next arg
@@ -367,6 +368,7 @@ namespace argh
          return string_stream(optIt->second);
 
       std::ostringstream ostr;
+      ostr.precision(std::numeric_limits<long double>::max_digits10);
       ostr << def_val;
       return string_stream(ostr.str()); // use default
    }
@@ -382,8 +384,9 @@ namespace argh
          auto optIt = params_.find(trim_leading_dashes(name));
          if (params_.end() != optIt)
             return string_stream(optIt->second);
-      }      
+      }
       std::ostringstream ostr;
+      ostr.precision(std::numeric_limits<long double>::max_digits10);
       ostr << def_val;
       return string_stream(ostr.str()); // use default
    }
@@ -406,6 +409,7 @@ namespace argh
       if (pos_args_.size() <= ind)
       {
          std::ostringstream ostr;
+         ostr.precision(std::numeric_limits<long double>::max_digits10);
          ostr << def_val;
          return string_stream(ostr.str());
       }
@@ -428,5 +432,3 @@ namespace argh
          registeredParams_.insert(trim_leading_dashes(name));
    }
 }
-
-
