@@ -220,7 +220,7 @@ Parse the command line using either
   `parser(argv);`
 
 ### Special Parsing Modes
-Extra flexibility can be added be specifying parsing modes:
+Extra flexibility can be added by specifying parsing modes:
 - **`NO_SPLIT_ON_EQUALSIGN`**:
    By default, an option of the form `--pi=22/7` will be parsed as a *parameter* `pi` with an associated value `"22/7"`.
    By setting this mode, it will be not be broken at the `=`.
