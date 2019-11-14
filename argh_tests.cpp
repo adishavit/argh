@@ -425,21 +425,21 @@ TEST_CASE("Handles const char versions as expected")
       CHECK(2 == cmdl.flags().size());
    }
    {    
-      char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
       CHECK(5 == cmdl.pos_args().size());
       CHECK(2 == cmdl.flags().size());
    }
    {
-      char * const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      const char* const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
       CHECK(5 == cmdl.pos_args().size());
       CHECK(2 == cmdl.flags().size());
    }
    {
-      char const* const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      const char* const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
       CHECK(5 == cmdl.pos_args().size());
@@ -459,17 +459,17 @@ void test(int argc, T&& argv)
 
 TEST_CASE("Handles char** const versions as expected")
 {
-   char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
    int argc = sizeof(argv) / sizeof(argv[0]);
 
    char const * const * const argvp_ccc = argv;
 
    char const * const *       argvp_cc0 = argv;
-   char       * const * const argvp_cc1 = argv;
+   char const * const * const argvp_cc1 = argv;
 // char const *       * const argvp_cc2 = argv;
 // const char *       *       argvp_c0  = argv;
-   char       * const *       argvp_c1  = argv;
-   char       *       * const argvp_c2  = argv;
+   char const * const *       argvp_c1  = argv;
+   char const *       * const argvp_c2  = argv;
 
    test(argc, argvp_ccc);
 
