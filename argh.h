@@ -60,7 +60,7 @@ namespace argh
 
       // Check the state of the stream.
       // False when the most recent stream operation failed
-      operator bool() const { return !!stream_; }
+      explicit operator bool() const { return !!stream_; }
 
       ~stringstream_proxy() = default;
    private:
