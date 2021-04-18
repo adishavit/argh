@@ -187,7 +187,7 @@ When this is not what you want, there are several ways to specify when an option
     >> my_app --threshold=42
     42
     ```
-    This will automatically be iterpreted as a named parameter-value pair. 
+    This will automatically be interpreted as a named parameter-value pair. 
     
     
 ### Tips
