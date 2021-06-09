@@ -28,12 +28,11 @@ endif()
 if(BUILD_TESTS)
 	add_executable(argh_tests   argh_tests.cpp)
 	target_compile_options(argh_tests PRIVATE ${flags})
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT argh_tests)
 endif()
 
 add_library(argh INTERFACE)
 target_include_directories(argh INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}> $<INSTALL_INTERFACE:include>)
-
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT argh_tests)
 
 if(ARGH_MASTER_PROJECT)
 	install(TARGETS argh EXPORT arghTargets)
