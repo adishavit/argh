@@ -777,3 +777,38 @@ TEST_CASE("Test size() member function")
       CHECK(cmdl.flags().size() == cmdl.size());
    }
 }
+
+TEST_CASE("Test single dash")
+{
+   {
+      const char* argv[] = { "--mode=foo", "-", "filein" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      const parser cmdl(argc, argv);
+      CHECK("-" == cmdl[0]);
+      CHECK("filein" == cmdl[1]);
+      CHECK(!cmdl["mode"]);
+      CHECK("foo" == cmdl("mode").str());
+   }
+}
+
+TEST_CASE("Test double dash")
+{
+   {
+      const char* argv[] = { "--flag", "--", "-a", "-b" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      const parser cmdl(argc, argv);
+      CHECK(cmdl["flag"]);
+      CHECK("-a" == cmdl[0]);
+      CHECK("-b" == cmdl[1]);
+   }
+
+   {
+      const char* argv[] = { "--", "--flag", "-a", "--", "-" };
+      int argc = sizeof(argv) / sizeof(argv[0]);
+      const parser cmdl(argc, argv);
+      CHECK("--flag" == cmdl[0]);
+      CHECK("-a" == cmdl[1]);
+      CHECK("--" == cmdl[2]);
+      CHECK("-" == cmdl[3]);
+   }
+}

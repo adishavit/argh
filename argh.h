@@ -146,6 +146,7 @@ namespace argh
       string_stream bad_stream() const;
       std::string trim_leading_dashes(std::string const& name) const;
       bool is_number(std::string const& arg) const;
+      bool is_delimiter(std::string const& arg) const;
       bool is_option(std::string const& arg) const;
       bool got_flag(std::string const& name) const;
       bool is_param(std::string const& name) const;
@@ -157,6 +158,7 @@ namespace argh
       std::multiset<std::string> flags_;
       std::set<std::string> registeredParams_;
       std::string empty_;
+      bool after_delimter_ = false;
    };
 
 
@@ -180,6 +182,11 @@ namespace argh
       // parse line
       for (auto i = 0u; i < args_.size(); ++i)
       {
+         if (is_delimiter(args_[i])) {
+            after_delimter_ = true;
+            continue;
+         }
+
          if (!is_option(args_[i]))
          {
             pos_args_.emplace_back(args_[i]);
@@ -282,10 +289,27 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
+   inline bool parser::is_delimiter(std::string const& arg) const
+   {
+      // https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02
+      // The first -- argument that is not an option-argument should be accepted as a delimiter 
+      // indicating the end of options.
+      assert(0 != arg.size());
+      if (after_delimter_)
+         return false;
+      return arg == "--";
+   }
+
+   //////////////////////////////////////////////////////////////////////////
+
    inline bool parser::is_option(std::string const& arg) const
    {
       assert(0 != arg.size());
+      if (after_delimter_)
+         return false;
       if (is_number(arg))
+         return false;
+      if (arg == "-")
          return false;
       return '-' == arg[0];
    }
