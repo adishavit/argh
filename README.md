@@ -30,6 +30,10 @@ int main(int, char* argv[])
     return EXIT_SUCCESS;
 }
 ```
+#### TL;DR Videos 
+- [Arguments over Arguments - Adi Shavit - Core C++ 2019](https://youtu.be/hCbEHzDvLno)
+- [Arguments over Arguments, but you already know this... - Adi Shavit - CppCon 2019](https://youtu.be/KkjKkGuQUqU)
+
 ## Philosophy
 
 Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
