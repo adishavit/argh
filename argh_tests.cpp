@@ -454,7 +454,7 @@ void test(int argc, T&& argv)
    auto cmdl = parser(argc, argv);
    CHECK(5 == cmdl.pos_args().size());
    CHECK(2 == cmdl.flags().size());
-};
+}
 
 
 TEST_CASE("Handles char** const versions as expected")
@@ -777,3 +777,18 @@ TEST_CASE("Test size() member function")
       CHECK(cmdl.flags().size() == cmdl.size());
    }
 }
+
+TEST_CASE("Test parse(...) idempotence") {
+    const char* argv_1[] = { "-a", "b", "-c=10", "d", "-f"};
+    const char* argv_2[] = { "-a", "b", "-d=c" };
+    int argc_1 = sizeof(argv_1) / sizeof(argv_1[0]);
+    int argc_2 = sizeof(argv_2) / sizeof(argv_2[0]);
+
+    parser cmdl(argc_1, argv_1);
+    cmdl.parse(argc_2, argv_2);
+
+    CHECK(std::multiset<std::string>{ "a" } == cmdl.flags());
+    CHECK(std::vector<std::string>{ "b" } == cmdl.pos_args());
+    CHECK(std::map<std::string, std::string>{ { "d", "c" } } == cmdl.params());
+}
+

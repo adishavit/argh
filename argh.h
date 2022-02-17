@@ -173,6 +173,11 @@ namespace argh
 
    inline void parser::parse(int argc, const char* const argv[], int mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
    {
+      // clear out possible previous parsing remnants
+      flags_.clear();
+      params_.clear();
+      pos_args_.clear();
+
       // convert to strings
       args_.resize(static_cast<decltype(args_)::size_type>(argc));
       std::transform(argv, argv + argc, args_.begin(), [](const char* const arg) { return arg;  });
