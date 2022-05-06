@@ -30,6 +30,10 @@ int main(int, char* argv[])
     return EXIT_SUCCESS;
 }
 ```
+#### TL;DR Videos 
+- [Arguments over Arguments - Adi Shavit - Core C++ 2019](https://youtu.be/hCbEHzDvLno)
+- [Arguments over Arguments, but you already know this... - Adi Shavit - CppCon 2019](https://youtu.be/KkjKkGuQUqU)
+
 ## Philosophy
 
 Contrary to many alternatives, `argh` takes a minimalist *laissez-faire* approach, very suitable for fuss-less prototyping with the following rules:
@@ -151,43 +155,49 @@ for (auto& param : cmdl.params())
 By default, options are assumed to be boolean flags. 
 When this is not what you want, there are several ways to specify when an option is a parameter with an associated value.  
 
-Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <non-option>` as `<parameter-name> <parameter-value>`:
-```cpp
-using namespace argh;
-auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
+ 1. Specify **`PREFER_PARAM_FOR_UNREG_OPTION`** mode to interpret *any* `<option> <non-option>` as `<parameter-name> <parameter-value>`:
+    ```cpp
+    using namespace argh;
+    auto cmdl = parser(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-cout << cmdl("--threshold").str() << '\n';
-```
-Pre-register an expected parameter name with `add_param()` (before calling `parse()`):
-```cpp
-argh::parser cmdl;
-cmdl.add_param("threshold"); // pre-register "threshold" as a param: name + value
-cmdl.parse(argc, argv);
-cout << cmdl("threshold").str() << '\n';
-```
-You can also *batch* pre-register multiple options as parameters with `add_params({ ... })`:
-```cpp
-argh::parser cmdl;
-cmdl.add_params({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register multiple params: name + value
-cmdl.parse(argc, argv);
-cout << cmdl("threshold").str() << '\n';
-```
-Since pre-registration has to be done *before* parsing, we might as well just use the ctor:
-```cpp
-argh::parser cmdl({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register multiple params: name + value
-cmdl.parse(argc, argv);
-cout << cmdl("threshold").str() << '\n';
-```
-Use a `=` (with no spaces around it) within the option when *calling* the app:
-```cpp
->> my_app --threshold=42
-42
-```
-
+    cout << cmdl("--threshold").str() << '\n';
+    ```
+    
+ 2. Pre-register an expected parameter name with `add_param()` (before calling `parse()`):
+    ```cpp
+    argh::parser cmdl;
+    cmdl.add_param("threshold"); // pre-register "threshold" as a param: name + value
+    cmdl.parse(argc, argv);
+    cout << cmdl("threshold").str() << '\n';
+    ```
+    You may also *batch* pre-register multiple options as parameters with `add_params({ ... })`:
+    ```cpp
+    argh::parser cmdl;
+    cmdl.add_params({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register multiple params: name + value
+    cmdl.parse(argc, argv);
+    cout << cmdl("threshold").str() << '\n';
+    ```
+    _Unregistered_ options will default to boolean flags.
+    
+ 3. Since pre-registration has to be done *before* parsing, we might as well just use the ctor:
+    ```cpp
+    argh::parser cmdl({ "-t", "--threshold", "-s", "--scale" }); // batch pre-register multiple params: name + value
+    cmdl.parse(argc, argv);
+    cout << cmdl("threshold").str() << '\n';
+    ```
+    
+ 4. Use a `=` with no spaces around it within the option when *calling* the app:
+    ```cpp
+    >> my_app --threshold=42
+    42
+    ```
+    This will automatically be interpreted as a named parameter-value pair. 
+    
+    
 ### Tips
 - By default, arguments of the form `--<name>=<value>` (with no spaces, one or more dashes), e.g. `--answer=42`, will be parsed as `<parameter-name> <parameter-value>`.
 To disable this specify the **`NO_SPLIT_ON_EQUALSIGN`** mode.
-- Specifying the **`SINGLE_DASH_IS_MULTIFLAG`** mode will split a single-hyphen argument into multiple single-character flags (as is common in various POSIX tools).
+- Specifying the **`SINGLE_DASH_IS_MULTIFLAG`** mode, a.k.a _Compound Arguments_, will split a single-hyphen argument into multiple single-character flags (as is common in various POSIX tools).
 - When using **`SINGLE_DASH_IS_MULTIFLAG`**, you can still pre-register the last character as a param with the value, such that if we pre-register `f` as a param, `>> myapp -xvf 42` will be parsed with two boolean flags `x` and `v` and a one param `f`=`42`.
 - When parsing parameter values as strings that may contain spaces (e.g. `--config="C:\Folder\With Space\Config.ini"`), prefer using `.str()` instead of `>>` to avoid the default automatic whitespace input stream tokenization:  
 `cout << cmdl({ "-c", "--config" }).str()`.
@@ -220,7 +230,7 @@ Parse the command line using either
   `parser(argv);`
 
 ### Special Parsing Modes
-Extra flexibility can be added be specifying parsing modes:
+Extra flexibility can be added by specifying parsing modes:
 - **`NO_SPLIT_ON_EQUALSIGN`**:
    By default, an option of the form `--pi=22/7` will be parsed as a *parameter* `pi` with an associated value `"22/7"`.
    By setting this mode, it will be not be broken at the `=`.
@@ -232,7 +242,7 @@ Extra flexibility can be added be specifying parsing modes:
   Interpret `<option> <non-option>` as `<parameter-name> <parameter-value>`.
   e.g. `myapp --gamma 2.2` will have `gamma` as a parameter with the value "2.2".
 - **`SINGLE_DASH_IS_MULTIFLAG`**:
-  Splits an option with a *single* dash into separate boolean flags, one for each letter.
+  Splits an option with a *single* dash into separate boolean flags, one for each letter (a.k.a _Compound Arguments_).
   e.g. in this mode, `-xvf` will be parsed as 3 separate flags: `x`, `v`, `f`.
 
 ### Argument Access
@@ -313,4 +323,6 @@ If you take `argh` as a submodule, then the visible target is `//:argh`.
 
 ## Colophon
 
-I ❤ your feedback. If you found Argh! useful - do Tweet about it to let [me](https://twitter.com/AdiShavit) know. If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).
+I ❤ your feedback.  
+If you found Argh! useful - do Tweet about it to let [me](https://twitter.com/AdiShavit) know.  
+If you found it lacking, please post an [issue](https://github.com/adishavit/argh/issues).

@@ -220,6 +220,19 @@ TEST_CASE("Test default value")
     val = -1;
     CHECK(!(cmdl("c", "bad-default") >> val));
     CHECK((-1 == val || 0 == val));
+
+    double pi     = 3.1415926535897932384626433832795028841971693993751058209749445;
+    double pi_val = 0;
+    CHECK((cmdl({"-pi, --archimedes-constant"}, pi) >> pi_val));
+    CHECK(pi == pi_val);
+
+    pi_val = 0;
+    CHECK((cmdl("-pi", pi) >> pi_val));
+    CHECK(pi == pi_val);
+
+    pi_val = 0;
+    CHECK((cmdl(argc + 1, pi) >> pi_val));
+    CHECK(pi == pi_val);
 }
 
 TEST_CASE("Leading dashed are stripped")
@@ -412,21 +425,21 @@ TEST_CASE("Handles const char versions as expected")
       CHECK(2 == cmdl.flags().size());
    }
    {    
-      char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
       CHECK(5 == cmdl.pos_args().size());
       CHECK(2 == cmdl.flags().size());
    }
    {
-      char * const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      const char* const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
       CHECK(5 == cmdl.pos_args().size());
       CHECK(2 == cmdl.flags().size());
    }
    {
-      char const* const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+      const char* const argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
       CHECK(5 == cmdl.pos_args().size());
@@ -441,22 +454,22 @@ void test(int argc, T&& argv)
    auto cmdl = parser(argc, argv);
    CHECK(5 == cmdl.pos_args().size());
    CHECK(2 == cmdl.flags().size());
-};
+}
 
 
 TEST_CASE("Handles char** const versions as expected")
 {
-   char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
+   const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
    int argc = sizeof(argv) / sizeof(argv[0]);
 
    char const * const * const argvp_ccc = argv;
 
    char const * const *       argvp_cc0 = argv;
-   char       * const * const argvp_cc1 = argv;
+   char const * const * const argvp_cc1 = argv;
 // char const *       * const argvp_cc2 = argv;
 // const char *       *       argvp_c0  = argv;
-   char       * const *       argvp_c1  = argv;
-   char       *       * const argvp_c2  = argv;
+   char const * const *       argvp_c1  = argv;
+   char const *       * const argvp_c2  = argv;
 
    test(argc, argvp_ccc);
 
@@ -763,6 +776,20 @@ TEST_CASE("Test size() member function")
       CHECK(3 == cmdl.size());
       CHECK(cmdl.flags().size() == cmdl.size());
    }
+}
+
+TEST_CASE("Test parse(...) idempotence") {
+    const char* argv_1[] = { "-a", "b", "-c=10", "d", "-f"};
+    const char* argv_2[] = { "-a", "b", "-d=c" };
+    int argc_1 = sizeof(argv_1) / sizeof(argv_1[0]);
+    int argc_2 = sizeof(argv_2) / sizeof(argv_2[0]);
+
+    parser cmdl(argc_1, argv_1);
+    cmdl.parse(argc_2, argv_2);
+
+    CHECK(std::multiset<std::string>{ "a" } == cmdl.flags());
+    CHECK(std::vector<std::string>{ "b" } == cmdl.pos_args());
+    CHECK(std::map<std::string, std::string>{ { "d", "c" } } == cmdl.params());
 }
 
 TEST_CASE("Test multiple parameters with the same name")
