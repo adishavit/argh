@@ -825,3 +825,36 @@ TEST_CASE("Test multiple parameters with the same name")
       CHECK(0 == values.size());
    }
 }
+TEST_CASE("Test adding duplicate flags")
+{
+	 {
+		  parser cmdl;
+		  const char* argv[] = { "-a", "-b", "-b" };  // "-b" inserted twice
+		  int argc = sizeof(argv) / sizeof(argv[0]);
+		  cmdl.parse(argc, argv);
+		  CHECK(3 == cmdl.flags().size());
+
+		  CHECK(cmdl["a"]);
+		  CHECK(cmdl["b"]);
+		  CHECK(!cmdl["c"]);
+	 }
+	 {
+		  const char* argv[] = { "-xxxxxx" };  // "-b" inserted twice
+		  int argc = sizeof(argv) / sizeof(argv[0]);
+		  parser cmdl;
+
+		  cmdl.parse(argc, argv);
+
+		  CHECK(cmdl["xxxxxx"]);  // expect as single flag
+		  CHECK(!cmdl["x"]);
+		  CHECK(1 == cmdl.flags().size());
+
+		  // re-parse with `SINGLE_DASH_IS_MULTIFLAG`
+		  cmdl.parse(argc, argv, parser::SINGLE_DASH_IS_MULTIFLAG);
+
+		  CHECK(!cmdl["xxxxxx"]);
+		  CHECK(cmdl["x"]);
+		  CHECK(6 == cmdl.flags().size());
+	 }
+}
+
