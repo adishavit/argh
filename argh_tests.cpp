@@ -778,7 +778,8 @@ TEST_CASE("Test size() member function")
    }
 }
 
-TEST_CASE("Test parse(...) idempotence") {
+TEST_CASE("Test parse(...) idempotence") 
+{
     const char* argv_1[] = { "-a", "b", "-c=10", "d", "-f"};
     const char* argv_2[] = { "-a", "b", "-d=c" };
     int argc_1 = sizeof(argv_1) / sizeof(argv_1[0]);
@@ -789,7 +790,7 @@ TEST_CASE("Test parse(...) idempotence") {
 
     CHECK(std::multiset<std::string>{ "a" } == cmdl.flags());
     CHECK(std::vector<std::string>{ "b" } == cmdl.pos_args());
-    CHECK(std::map<std::string, std::string>{ { "d", "c" } } == cmdl.params());
+    CHECK(std::multimap<std::string, std::string>{ { "d", "c" } } == cmdl.params());
 }
 
 TEST_CASE("Test multiple parameters with the same name")
@@ -825,6 +826,7 @@ TEST_CASE("Test multiple parameters with the same name")
       CHECK(0 == values.size());
    }
 }
+
 TEST_CASE("Test adding duplicate flags")
 {
 	 {
