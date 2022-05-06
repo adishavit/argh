@@ -151,6 +151,14 @@ for (auto& param : cmdl.params())
   cout << '\t' << param.first << " : " << param.second << '\n';
 ```
 
+If a parameter appears several times in the command line, all its duplicates may be accessed, in order, like so:
+
+```cpp
+cout << "\nValues for all `--input` parameters:\n";
+for (auto& param : cmdl.params("input"))  // iterate on all params called "input"
+  cout << '\t' << param.first << " : " << param.second << '\n';
+```
+
 
 By default, options are assumed to be boolean flags. 
 When this is not what you want, there are several ways to specify when an option is a parameter with an associated value.  
