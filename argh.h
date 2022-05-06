@@ -462,6 +462,7 @@ namespace argh
 
    inline multimap_iteration_wrapper parser::params(std::string const& name) const
    {
-      return multimap_iteration_wrapper(params_.lower_bound(name), params_.upper_bound(name));
+      auto trimmed_name = trim_leading_dashes(name);
+      return multimap_iteration_wrapper(params_.lower_bound(trimmed_name), params_.upper_bound(trimmed_name));
    }
 }

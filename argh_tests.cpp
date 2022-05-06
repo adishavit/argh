@@ -809,6 +809,7 @@ TEST_CASE("Test multiple parameters with the same name")
       CHECK(4 == cmdl.params().size());
       CHECK(1 == cmdl.params("bar").size());
       CHECK(3 == cmdl.params("foo").size());
+      CHECK(3 == cmdl.params("--foo").size());
 
       for (const auto& param : cmdl.params("foo")) {
          auto found = values.find(param.second);
