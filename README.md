@@ -310,6 +310,25 @@ target_link_libraries(${MY_TARGET_NAME} argh)
 
 ```
 
+## Tipi.build
+
+`argh` can be easily used in [tipi.build](https://tipi.build) projects simply by adding the following entry to your `.tipi/deps`:
+
+```json
+{
+    "adishavit/argh": { "x": [ "*.cpp" ]}
+}
+```
+
+> `argh` itself is a header-only library hence the exclusion of all `.cpp` files above. This isn't stricly required to inlcude `argh` but speeds up the build.
+
+To try this you can run the following command in `/test_package` (change the target name appropriately to `linux` or `macos` or `windows`):
+
+```bash=
+tipi . -t <target>
+./build/linux-cxx17/bin/test_package -v
+```
+
 ## Buck
 
 The [Buck](https://buckbuild.com/) build system is also supported. 
