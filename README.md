@@ -310,9 +310,15 @@ target_link_libraries(${MY_TARGET_NAME} argh)
 
 ```
 
-## Buck
 
-The [Buck](https://buckbuild.com/) build system is also supported. 
+### Additional Build Systems
+<details>
+    <summary><b>Buck</b></summary>
+
+<table>
+<td>  
+    
+[Buck](https://buckbuild.com/) support: 
 
 Run the example: 
 
@@ -326,8 +332,12 @@ Run the tests:
 buck run :tests
 buck run test_package
 ```
-
 If you take `argh` as a submodule, then the visible target is `//:argh`. 
+</td>
+</table>
+
+    
+</details>
 
 ## Colophon
 
