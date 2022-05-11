@@ -114,6 +114,7 @@ namespace argh
 
       void parse(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
       void parse(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
+      void parser::parse(const std::vector<std::string>& argv, int mode);
 
       std::multiset<std::string>               const& flags()    const { return flags_;    }
       std::multimap<std::string, std::string>  const& params()   const { return params_;   }
@@ -194,14 +195,25 @@ namespace argh
 
    inline void parser::parse(int argc, const char* const argv[], int mode /*= PREFER_FLAG_FOR_UNREG_OPTION*/)
    {
+      std::vector<std::string> args;
+
+      // convert to strings
+      args.resize(static_cast<decltype(args_)::size_type>(argc));
+      std::transform(argv, argv + argc, args.begin(), [](const char* const arg) { return arg; });
+
+      parse(args, mode);
+   }
+
+   //////////////////////////////////////////////////////////////////////////
+
+   inline void parser::parse(const std::vector<std::string>& argv, int mode)
+   {
       // clear out possible previous parsing remnants
       flags_.clear();
       params_.clear();
       pos_args_.clear();
 
-      // convert to strings
-      args_.resize(static_cast<decltype(args_)::size_type>(argc));
-      std::transform(argv, argv + argc, args_.begin(), [](const char* const arg) { return arg;  });
+      args_ = argv;
 
       // parse line
       for (auto i = 0u; i < args_.size(); ++i)
