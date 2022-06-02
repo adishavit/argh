@@ -114,7 +114,7 @@ namespace argh
 
       void parse(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
       void parse(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
-      void parser::parse(const std::vector<std::string>& argv, int mode);
+      void parse(const std::vector<std::string>& argv, int mode = PREFER_FLAG_FOR_UNREG_OPTION);
 
       std::multiset<std::string>               const& flags()    const { return flags_;    }
       std::multimap<std::string, std::string>  const& params()   const { return params_;   }
