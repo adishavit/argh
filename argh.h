@@ -109,6 +109,9 @@ namespace argh
       parser(int argc, const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION)
       {  parse(argc, argv, mode); }
 
+      parser(const std::vector<std::string>& argv, int mode = PREFER_FLAG_FOR_UNREG_OPTION) 
+      {  parse(argv, mode); };
+
       void add_param(std::string const& name);
       void add_params(std::initializer_list<char const* const> init_list);
 
