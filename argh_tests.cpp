@@ -861,3 +861,25 @@ TEST_CASE("Test adding duplicate flags")
 	 }
 }
 
+TEST_CASE("Test parsing single with add_params")
+{
+    const char fixture[] = "abc-123";
+    const char* argv[] = { "-a",fixture, nullptr };
+    parser cmdl;
+    cmdl.add_params("a");
+    cmdl.parse(argv);
+
+    CHECK(fixture == cmdl({"a"}).str());
+}
+
+TEST_CASE("Test parsing multiple with add_param")
+{
+    const char fixture[] = "abc-123";
+    const char* argv[] = { "-a",fixture, "-b", "2", "-c", "3", nullptr };
+    parser cmdl;
+    cmdl.add_param({"a", "b", "c"});
+    cmdl.parse(argv);
+
+    CHECK(cmdl({"a", "b", "c"}));
+    CHECK(fixture == cmdl({"a"}).str());
+}

@@ -110,6 +110,9 @@ namespace argh
       {  parse(argc, argv, mode); }
 
       void add_param(std::string const& name);
+      void add_params(std::string const& name);
+
+      void add_param(std::initializer_list<char const* const> init_list);
       void add_params(std::initializer_list<char const* const> init_list);
 
       void parse(const char* const argv[], int mode = PREFER_FLAG_FOR_UNREG_OPTION);
@@ -452,10 +455,24 @@ namespace argh
 
    //////////////////////////////////////////////////////////////////////////
 
+   inline void parser::add_param(std::initializer_list<const char *const> init_list)
+   {
+       parser::add_params(init_list);
+   }
+
+   //////////////////////////////////////////////////////////////////////////
+
    inline void parser::add_params(std::initializer_list<char const* const> init_list)
    {
       for (auto& name : init_list)
          registeredParams_.insert(trim_leading_dashes(name));
+   }
+
+   //////////////////////////////////////////////////////////////////////////
+
+   inline void parser::add_params(const std::string &name)
+   {
+       parser::add_param(name);
    }
 
    //////////////////////////////////////////////////////////////////////////
