@@ -8,7 +8,14 @@
 #include <set>
 #include <map>
 #include <cassert>
-#include <ranges>
+
+#if __cplusplus >= 201703L && __has_include( <version> )
+#  include <version> // for library features tests
+#endif
+
+#if defined( __cpp_lib_ranges )
+#  include <ranges>
+#endif
 
 namespace argh
 {
@@ -122,7 +129,9 @@ namespace argh
       std::multiset<std::string>               const& flags()    const { return flags_;    }
       std::multimap<std::string, std::string>  const& params()   const { return params_;   }
       multimap_iteration_wrapper                      params(std::string const& name) const;
+#if defined( __cpp_lib_ranges )
       auto                                            params(std::initializer_list<char const* const> init_list) const;
+#endif
       std::vector<std::string>                 const& pos_args() const { return pos_args_; }
 
       // begin() and end() for using range-for over positional args.
@@ -485,6 +494,9 @@ namespace argh
       return multimap_iteration_wrapper(params_.lower_bound(trimmed_name), params_.upper_bound(trimmed_name));
    }
 
+   //////////////////////////////////////////////////////////////////////////
+
+#if defined( __cpp_lib_ranges )
    inline auto parser::params(std::initializer_list<char const* const> init_list) const
    {
       return std::ranges::subrange( init_list.begin(), init_list.end() ) |
@@ -493,4 +505,5 @@ namespace argh
          } ) |
          std::views::join;
    }
+#endif
 }
