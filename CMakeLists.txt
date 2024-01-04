@@ -42,7 +42,7 @@ if(ARGH_MASTER_PROJECT)
 	install(FILES "${CMAKE_CURRENT_LIST_DIR}/LICENSE" DESTINATION ${CMAKE_INSTALL_DOCDIR})
 	install(FILES "${CMAKE_CURRENT_LIST_DIR}/README.md" DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
-	if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+	if(APPLE OR CMAKE_SYSTEM_NAME STREQUAL Linux)
 	# this might be a bit too restrictive, since for other (BSD, ...) this might apply also
 	# but this can be fixed later in extra pull requests from people on the platform
 		install(FILES argh-config.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/argh)
