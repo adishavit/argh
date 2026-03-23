@@ -1,5 +1,11 @@
-build/
-.vs/
-buck-out/
-.buckd/
 .buckconfig.local
+.buckd/
+.vs/
+argh_example
+argh_tests
+buck-out/
+build/
+cmake_install.cmake
+CMakeCache.txt
+CMakeFiles/
+Makefile
