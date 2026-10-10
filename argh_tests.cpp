@@ -51,7 +51,7 @@ TEST_CASE("Test positional access")
     CHECK(5 == cmdl.pos_args().size());
     for (auto parg : cmdl.pos_args())
         CHECK(!parg.empty());
-    
+
     CHECK(cmdl[0] == "0");
     CHECK(cmdl[1] == "1");
     CHECK(cmdl[2] == "2");
@@ -127,9 +127,9 @@ TEST_CASE("Test failed istream access")
     parser cmdl;
     cmdl.parse(argc, argv, parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
-    int v_int = -1;    
+    int v_int = -1;
     double v_dbl = -1;
-    
+
     CHECK(!(cmdl("-string") >> v_int));
     CHECK((-1 == v_int || 0 == v_int)); // pre-C++11 vs post-C++11, see http://goo.gl/H6T2Ow
 
@@ -417,14 +417,14 @@ TEST_CASE("Interpret single-dash arg as multi-flag")
 
 TEST_CASE("Handles const char versions as expected")
 {
-   {    
+   {
       const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
       CHECK(5 == cmdl.pos_args().size());
       CHECK(2 == cmdl.flags().size());
    }
-   {    
+   {
       const char* argv[] = { "0", "-a", "1", "-b", "2", "3", "4" };
       int argc = sizeof(argv) / sizeof(argv[0]);
       auto cmdl = parser(argc, argv);
@@ -727,21 +727,21 @@ TEST_CASE("Test const correctness")
    CHECK(cmdl["x"]);
    CHECK(cmdl[{"x"}]);
 
-   [](argh::parser const& cmdl)
+   [](argh::parser const& cmdl_ref)
    {
-      CHECK(1 == cmdl.pos_args().size());
-      CHECK(1 == cmdl.size());
+      CHECK(1 == cmdl_ref.pos_args().size());
+      CHECK(1 == cmdl_ref.size());
 
-      for (auto arg : cmdl)
+      for (auto arg : cmdl_ref)
          CHECK(std::to_string(42) == arg);
 
-      for (auto arg : cmdl.pos_args())
+      for (auto arg : cmdl_ref.pos_args())
          CHECK(std::to_string(42) == arg);
 
-      for (auto arg : cmdl.flags())
+      for (auto arg : cmdl_ref.flags())
          CHECK("x" == arg);
 
-      for (auto arg : cmdl.params())
+      for (auto arg : cmdl_ref.params())
       {
          CHECK("a" == arg.first);
          CHECK("1" == arg.second);
@@ -830,41 +830,41 @@ TEST_CASE("Test multiple parameters with the same name")
 
 TEST_CASE("Test adding duplicate flags")
 {
-	 {
-		  parser cmdl;
-		  const char* argv[] = { "-a", "-b", "-b" };  // "-b" inserted twice
-		  int argc = sizeof(argv) / sizeof(argv[0]);
-		  cmdl.parse(argc, argv);
-		  CHECK(3 == cmdl.flags().size());
+    {
+        parser cmdl;
+        const char* argv[] = { "-a", "-b", "-b" };  // "-b" inserted twice
+        int argc = sizeof(argv) / sizeof(argv[0]);
+        cmdl.parse(argc, argv);
+        CHECK(3 == cmdl.flags().size());
 
-		  CHECK(cmdl["a"]);
-		  CHECK(cmdl["b"]);
-		  CHECK(!cmdl["c"]);
-	 }
-	 {
-		  const char* argv[] = { "-xxxxxx" };  // "-b" inserted twice
-		  int argc = sizeof(argv) / sizeof(argv[0]);
-		  parser cmdl;
+        CHECK(cmdl["a"]);
+        CHECK(cmdl["b"]);
+        CHECK(!cmdl["c"]);
+    }
+    {
+        const char* argv[] = { "-xxxxxx" };  // "-b" inserted twice
+        int argc = sizeof(argv) / sizeof(argv[0]);
+        parser cmdl;
 
-		  cmdl.parse(argc, argv);
+        cmdl.parse(argc, argv);
 
-		  CHECK(cmdl["xxxxxx"]);  // expect as single flag
-		  CHECK(!cmdl["x"]);
-		  CHECK(1 == cmdl.flags().size());
+        CHECK(cmdl["xxxxxx"]);  // expect as single flag
+        CHECK(!cmdl["x"]);
+        CHECK(1 == cmdl.flags().size());
 
-		  // re-parse with `SINGLE_DASH_IS_MULTIFLAG`
-		  cmdl.parse(argc, argv, parser::SINGLE_DASH_IS_MULTIFLAG);
+        // re-parse with `SINGLE_DASH_IS_MULTIFLAG`
+        cmdl.parse(argc, argv, parser::SINGLE_DASH_IS_MULTIFLAG);
 
-		  CHECK(!cmdl["xxxxxx"]);
-		  CHECK(cmdl["x"]);
-		  CHECK(6 == cmdl.flags().size());
-	 }
+        CHECK(!cmdl["xxxxxx"]);
+        CHECK(cmdl["x"]);
+        CHECK(6 == cmdl.flags().size());
+    }
 }
 
 TEST_CASE("Test parsing single with add_params")
 {
     const char fixture[] = "abc-123";
-    const char* argv[] = { "-a",fixture, nullptr };
+    const char* argv[] = { "-a", fixture, nullptr };
     parser cmdl;
     cmdl.add_params("a");
     cmdl.parse(argv);
@@ -875,11 +875,25 @@ TEST_CASE("Test parsing single with add_params")
 TEST_CASE("Test parsing multiple with add_param")
 {
     const char fixture[] = "abc-123";
-    const char* argv[] = { "-a",fixture, "-b", "2", "-c", "3", nullptr };
+    const char* argv[] = { "-a", fixture, "-b", "2", "-c", "3", nullptr };
     parser cmdl;
     cmdl.add_param({"a", "b", "c"});
     cmdl.parse(argv);
 
     CHECK(cmdl({"a", "b", "c"}));
     CHECK(fixture == cmdl({"a"}).str());
+}
+
+TEST_CASE("Test multidimensional subscript operator")
+{
+    const char* argv[] = { "-a", "5", "-b", "-c" };
+    parser cmdl;
+
+    cmdl.parse(argv);
+
+    if constexpr (__cplusplus < 202302) CHECK(doctest::Result{true}); return;
+
+    if (cmdl["-a", "--xxx"]) {
+        CHECK(doctest::Result{true});
+    }
 }

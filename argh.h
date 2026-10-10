@@ -137,6 +137,11 @@ namespace argh
       // multiple flag (boolean) accessors: return true if at least one of the flag appeared, otherwise false.
       bool operator[](std::initializer_list<char const* const> init_list) const;
 
+#     if __cplusplus > 202302
+      // multiple flag (boolean) accessors: return true if at least one of the flag appeared, otherwise false.
+      bool operator[](const char* short_opt, const char* long_opt) const;
+#     endif
+
       // returns positional arg string by order. Like argv[] but without the options
       std::string const& operator[](size_t ind) const;
 
@@ -354,6 +359,15 @@ namespace argh
    {
       return std::any_of(init_list.begin(), init_list.end(), [&](char const* const name) { return got_flag(name); });
    }
+
+   //////////////////////////////////////////////////////////////////////////
+
+#  if __cplusplus > 202302
+   inline bool parser::operator[](const char* short_opt, const char* long_opt) const
+   {
+       return got_flag(short_opt) || got_flag(long_opt);
+   }
+#  endif
 
    //////////////////////////////////////////////////////////////////////////
 
